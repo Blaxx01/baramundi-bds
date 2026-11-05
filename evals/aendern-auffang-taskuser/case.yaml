@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: aendern-auffang-taskuser
+expected_outcome: |
+  Check_TaskUser.bds direkt geändert, Original als .bak gesichert: bedingungsloses EndBDS (Fehler) als letzte Aktion, Meldung ohne PowerShell-Variable; übrige Teile inkl. eingebettetem Skript byte-gleich; weitere Befunde (z. B. protokolliertes Kennwort) nur genannt.
+context:
+  scaffold_script: place-files.sh

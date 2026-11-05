@@ -1,0 +1,2 @@
+# .bds sind ISO-8859-1 mit CRLF und muessen byte-genau bleiben
+*.bds binary

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<baramundiDeployScript Version="2420" LastChange="04.11.2026 07:17:27">
+<META>
+<INFO Vendor="" Name="" Version="" Author="" Comment=""/>
+<STATICVARS LoadInstallIni="1">
+<BMSVars></BMSVars>
+</STATICVARS>
+</META>
+<ACTIONS>
+<ACTION type="SetVar" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>TaskUser</VARNAME>
+<VALUE>{JobParam.TaskUser}</VALUE>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="SetVar" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>taskName</VARNAME>
+<VALUE>{JobParam.taskName}</VALUE>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="SetVar" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>Logdir</VARNAME>
+<VALUE>{JobParam.Logdir}</VALUE>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="SetVar" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>changetToUser</VARNAME>
+<VALUE>$true</VALUE>
+<OPTIONS>0</OPTIONS>
+</DATA>
+<CONDITION op1="{JobParam.changetToUser}" op="=" op2="T" options="0"/>
+</ACTION>
+<ACTION type="SetVar" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>changetToUser</VARNAME>
+<VALUE>$false</VALUE>
+<OPTIONS>0</OPTIONS>
+</DATA>
+<CONDITION op1="{JobParam.changetToUser}" op="=" op2="F" options="0"/>
+</ACTION>
+<ACTION type="SetVar" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>UserPassword</VARNAME>
+<VALUE>{JobParam.UserPassword}</VALUE>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="SetX64Mode" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<MODE>1</MODE>
+</DATA>
+</ACTION>
+<ACTION type="RunEmbeddedScript" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<SCRIPTLANGUAGE>PowerShell</SCRIPTLANGUAGE>
+<RETURNCODES>*</RETURNCODES>
+<VARNAME>Success</VARNAME>
+<SCRIPT>﻿# Prüft, ob die Aufgabe &quot;vd_task&quot; unter dem erwarteten Benutzerkonto läuft
+# (Aufgabenplanung: &quot;Beim Ausführen der Aufgabe folgendes Benutzerkonto verwenden&quot;).
+# Mit -Umstellen -Kennwort &apos;...&apos; wird die Aufgabe bei falschem Benutzer auf $Benutzer umgestellt.
+# Exitcodes: 0 = Benutzer stimmt, 1 = anderer Benutzer eingetragen,
+#            2 = Aufgabe nicht gefunden, 3 = sonstiger Fehler,
+#            4 = auf $Benutzer umgestellt, 5 = Umstellen fehlgeschlagen, Aufgabe unverändert
+param(
+    [string]$Benutzer = &apos;firma.local\{TaskUser}&apos;,
+    [string]$TaskName = &apos;{taskName}&apos;,
+    [string]$LogDatei = &apos;{Logdir}&apos;,
+    [switch]$Umstellen = {changetToUser},
+    [string]$Kennwort = &apos;{UserPassword}&apos;
+)
+
+function Ende([int]$Code, [string]$Text) {
+    $zeile = &apos;{0:yyyy-MM-dd HH:mm:ss}  Code {1}  {2}&apos; -f (Get-Date), $Code, $Text
+    Write-Output $zeile
+    Add-Content -Path $LogDatei -Value $zeile -Encoding UTF8
+    exit $Code
+}
+
+trap { Ende 3 &quot;Fehler: $_&quot; }
+
+$task = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue | Select-Object -First 1
+if (-not $task) { Ende 2 &quot;Aufgabe &apos;$TaskName&apos; nicht gefunden (oder kein Zugriff).&quot; }
+
+[string]$ist = $task.Principal.UserId
+if (-not $ist) { $ist = $task.Principal.GroupId }
+
+# Domäne nur vergleichen, wenn sie auf beiden Seiten angegeben ist
+if ($ist.Contains(&apos;\&apos;) -and $Benutzer.Contains(&apos;\&apos;)) { $ok = $ist -eq $Benutzer }
+else { $ok = ($ist -split &apos;\\&apos;)[-1] -eq ($Benutzer -split &apos;\\&apos;)[-1] }
+
+if ($ok) { Ende 0 &quot;OK: Aufgabe &apos;$TaskName&apos; läuft als &apos;$ist&apos;.&quot; }
+if (-not $Umstellen) { Ende 1 &quot;Falsch: Aufgabe &apos;$TaskName&apos; läuft als &apos;$ist&apos;, erwartet &apos;$Benutzer&apos;.&quot; }
+
+try { [void]([Security.Principal.NTAccount]$Benutzer).Translate([Security.Principal.SecurityIdentifier]) }
+catch { Ende 5 &quot;Konto &apos;$Benutzer&apos; unbekannt, nichts geändert. Aufgabe läuft weiter als &apos;$ist&apos;.&quot; }
+
+if (-not $Kennwort) { Ende 5 &quot;Kein Kennwort übergeben (-Kennwort), nichts geändert. Aufgabe läuft weiter als &apos;$ist&apos;.&quot; }
+
+# Die Aufgabenplanung prüft Konto und Kennwort selbst und speichert bei einem Fehler nichts
+try {
+    Set-ScheduledTask -TaskName $TaskName -TaskPath $task.TaskPath -User $Benutzer -Password $Kennwort -ErrorAction Stop | Out-Null
+} catch {
+    $jetzt = (Get-ScheduledTask -TaskName $TaskName -TaskPath $task.TaskPath).Principal.UserId
+    Ende 5 &quot;Umstellen fehlgeschlagen ($($_.Exception.Message.Trim())). Aufgabe läuft weiter als &apos;$jetzt&apos;.&quot;
+}
+
+$neu = (Get-ScheduledTask -TaskName $TaskName -TaskPath $task.TaskPath).Principal.UserId
+Ende 4 &quot;Umgestellt: Aufgabe &apos;$TaskName&apos; läuft jetzt als &apos;$neu&apos; (vorher &apos;$ist&apos;).&quot;
+</SCRIPT>
+<HIDDENEXECUTION>1</HIDDENEXECUTION>
+</DATA>
+</ACTION>
+<ACTION type="EndBDS" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<RETURNMESSAGE>Benutzer Stimmt</RETURNMESSAGE>
+<RETURNMODESTR>1</RETURNMODESTR>
+<RETURNCODESTR></RETURNCODESTR>
+</DATA>
+<CONDITION op1="{Success}" op="=" op2="0" options="0"/>
+</ACTION>
+<ACTION type="EndBDS" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<RETURNMESSAGE>anderer Benutzer eingetragen</RETURNMESSAGE>
+<RETURNMODESTR>0</RETURNMODESTR>
+<RETURNCODESTR></RETURNCODESTR>
+</DATA>
+<CONDITION op1="{Success}" op="=" op2="1" options="1"/>
+</ACTION>
+<ACTION type="EndBDS" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<RETURNMESSAGE>Aufgabe nicht gefunden</RETURNMESSAGE>
+<RETURNMODESTR>0</RETURNMODESTR>
+<RETURNCODESTR></RETURNCODESTR>
+</DATA>
+<CONDITION op1="{Success}" op="=" op2="2" options="0"/>
+</ACTION>
+<ACTION type="EndBDS" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<RETURNMESSAGE>Unbekannter Fehler</RETURNMESSAGE>
+<RETURNMODESTR>0</RETURNMODESTR>
+<RETURNCODESTR></RETURNCODESTR>
+</DATA>
+<CONDITION op1="{Success}" op="=" op2="3" options="0"/>
+</ACTION>
+<ACTION type="EndBDS" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<RETURNMESSAGE>auf $Benutzer umgestellt</RETURNMESSAGE>
+<RETURNMODESTR>1</RETURNMODESTR>
+<RETURNCODESTR></RETURNCODESTR>
+</DATA>
+<CONDITION op1="{Success}" op="=" op2="4" options="0"/>
+</ACTION>
+<ACTION type="EndBDS" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<RETURNMESSAGE>Umstellen fehlgeschlagen, Aufgabe unver�ndert</RETURNMESSAGE>
+<RETURNMODESTR>0</RETURNMODESTR>
+<RETURNCODESTR></RETURNCODESTR>
+</DATA>
+<CONDITION op1="{Success}" op="=" op2="5" options="0"/>
+</ACTION>
+</ACTIONS>
+</baramundiDeployScript>

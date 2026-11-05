@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: neu-spooler-leeren
+expected_outcome: |
+  Eine gültige .bds (ISO-8859-1), die mit nativen Aktionen den Dienst Spooler stoppt, die Dateien in spool\PRINTERS löscht (x64-Modus wegen System32) und den Dienst startet; Ende mit klarer EndBDS-Meldung.

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: neu-alte-profile
+expected_outcome: |
+  Gültige .bds mit eingebettetem PowerShell im Hausstil (EINSTELLUNGEN-Block, Standardwert-Zeilen, Log nach C:\Windows\Temp\<Skriptname>.log, Exitcodes ohne 1, trap 99), x64-Modus davor, EndBDS je Exitcode plus Auffang.

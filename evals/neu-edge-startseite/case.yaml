@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: neu-edge-startseite
+expected_outcome: |
+  Gültige .bds: URL aus Job-Parameter per Variable setzen, Prüfung ob Edge installiert ist mit bedingtem EndBDS (Fehler) vor jeder Änderung, SetRegValue REG_SZ in HKLM\SOFTWARE\Policies\Microsoft\Edge im x64-Modus, Erfolgsmeldung am Ende; Antwort mit Job-Parameter-Tabelle.

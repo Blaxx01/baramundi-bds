@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: pruefen-universalscript
+expected_outcome: |
+  Deutsche Erklärung des Ablaufs nach Abschnitten und eine nach Schwere geordnete Befundliste, darunter der Variablen-Tippfehler und die Registry-Zugriffe ohne x64-Modus; Datei unverändert.
+context:
+  scaffold_script: place-files.sh

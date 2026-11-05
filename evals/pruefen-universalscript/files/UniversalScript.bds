@@ -1,0 +1,887 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<baramundiDeployScript Version="2420" LastChange="04.11.2026 13:22:06">
+<META>
+<INFO Vendor="" Name="" Version="" Author="" Comment=""/>
+<STATICVARS LoadInstallIni="1">
+<BMSVars></BMSVars>
+</STATICVARS>
+</META>
+<ACTIONS>
+<ACTION type="Comment" level="0" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Kommentar</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="0" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Benutzerinteraktion</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="ShowMsg" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<FORMAT>0</FORMAT>
+<CONTENT>Das Ist ein .bds script mit den meisten nützlichen einstellungen</CONTENT>
+<OPTIONS>47</OPTIONS>
+<TIMEOUT>60</TIMEOUT>
+</DATA>
+</ACTION>
+<ACTION type="ShowMsg" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<FORMAT>1</FORMAT>
+<CONTENT>Das Ist ein .bds script mit den meisten nützlichen einstellungen</CONTENT>
+<OPTIONS>39</OPTIONS>
+<TIMEOUT>60</TIMEOUT>
+</DATA>
+</ACTION>
+<ACTION type="ShowMsg" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<FORMAT>2</FORMAT>
+<CONTENT>https://m365.cloud.microsoft/de-de/</CONTENT>
+<OPTIONS>63</OPTIONS>
+<TIMEOUT>60</TIMEOUT>
+</DATA>
+</ACTION>
+<ACTION type="ShowMsg" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<FORMAT>3</FORMAT>
+<CONTENT>C:\Temp\verlauf-shutdownjob.log</CONTENT>
+<OPTIONS>33</OPTIONS>
+<TIMEOUT>60</TIMEOUT>
+</DATA>
+</ACTION>
+<ACTION type="UserInput" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<USERINPUTCAPTION>Benutzereingabe</USERINPUTCAPTION><USERINPUTTEXT>Das ist ein fenster mit eingaben</USERINPUTTEXT><VARNAME>ReturnInput</VARNAME><USERINPUTBUTTONS><USERINPUTBUTTONTEXT>Schaltfläche 1</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 2</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 3</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 4</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 5</USERINPUTBUTTONTEXT></USERINPUTBUTTONS><USERINPUTDEFAULTCHOICE>2</USERINPUTDEFAULTCHOICE><USERINPUTUSETIMEOUT>true</USERINPUTUSETIMEOUT><USERINPUTTIMEOUT>60</USERINPUTTIMEOUT><USERINPUTICON>32</USERINPUTICON></DATA>
+</ACTION>
+<ACTION type="UserInput" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<USERINPUTCAPTION>Benutzereingabe2</USERINPUTCAPTION><USERINPUTTEXT>Das ist ein fenster mit eingaben</USERINPUTTEXT><VARNAME>ReturnInput</VARNAME><USERINPUTBUTTONS><USERINPUTBUTTONTEXT>Schaltfläche 1</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 2</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 3</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 4</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 5</USERINPUTBUTTONTEXT></USERINPUTBUTTONS><USERINPUTDEFAULTCHOICE>10000</USERINPUTDEFAULTCHOICE><USERINPUTUSETIMEOUT>false</USERINPUTUSETIMEOUT><USERINPUTTIMEOUT>60</USERINPUTTIMEOUT><USERINPUTICON>64</USERINPUTICON></DATA>
+</ACTION>
+<ACTION type="UserInput" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<USERINPUTCAPTION>Benutzereingabe3</USERINPUTCAPTION><USERINPUTTEXT>Das ist ein fenster mit eingaben</USERINPUTTEXT><VARNAME>ReturnInputtest</VARNAME><USERINPUTBUTTONS><USERINPUTBUTTONTEXT>Schaltfläche 1</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 2</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 3</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 4</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 5</USERINPUTBUTTONTEXT></USERINPUTBUTTONS><USERINPUTDEFAULTCHOICE>10002</USERINPUTDEFAULTCHOICE><USERINPUTUSETIMEOUT>true</USERINPUTUSETIMEOUT><USERINPUTTIMEOUT>126</USERINPUTTIMEOUT><USERINPUTICON>48</USERINPUTICON></DATA>
+</ACTION>
+<ACTION type="UserInput" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<USERINPUTCAPTION>Benutzereingabe2</USERINPUTCAPTION><USERINPUTTEXT>Das ist ein fenster mit eingaben</USERINPUTTEXT><VARNAME>ReturnInputfailed</VARNAME><USERINPUTBUTTONS><USERINPUTBUTTONTEXT>Schaltfläche 1</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 2</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 3</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 4</USERINPUTBUTTONTEXT><USERINPUTBUTTONTEXT>Schaltfläche 5</USERINPUTBUTTONTEXT></USERINPUTBUTTONS><USERINPUTDEFAULTCHOICE>10000</USERINPUTDEFAULTCHOICE><USERINPUTUSETIMEOUT>false</USERINPUTUSETIMEOUT><USERINPUTTIMEOUT>60</USERINPUTTIMEOUT><USERINPUTICON>16</USERINPUTICON></DATA>
+</ACTION>
+<ACTION type="Comment" level="0" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Variablen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="SetVar" level="1" breakpoint="0" ignore_error="1" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>SetVariabel</VARNAME>
+<VALUE>Irgendwas</VALUE>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="SetVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="0">
+<DATA>
+<VARNAME>SetVariabelList</VARNAME>
+<VALUE>1;2;3;Vier;5;6</VALUE>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="SetVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>SetVariabel1</VARNAME>
+<VALUE>Irgendwas</VALUE>
+<OPTIONS>1</OPTIONS>
+</DATA>
+<CONDITION op1="{SetVariabel}" op="=" op2="Irgendwas" options="0"/>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>TestRegistryVar</VARNAME>
+<SOURCE>Registry</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Key</Param><Value>SOFTWARE\Microsoft\ClipboardServer</Value></PropertyEntry><PropertyEntry><Param>Registry</Param><Value>HKEY_LOCAL_MACHINE</Value></PropertyEntry><PropertyEntry><Param>Value</Param><Value>MaxSizeAllowedInKBytes</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>ReadIniVar</VARNAME>
+<SOURCE>IniFile</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>File</Param><Value>C:\Windows\Temp\Setup.ini</Value></PropertyEntry><PropertyEntry><Param>Param</Param><Value>EnableLangDlg</Value></PropertyEntry><PropertyEntry><Param>Section</Param><Value>Startup</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>StringCutVar</VARNAME>
+<SOURCE>SubString</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Length</Param><Value>4</Value></PropertyEntry><PropertyEntry><Param>Start</Param><Value>2</Value></PropertyEntry><PropertyEntry><Param>String</Param><Value>{SetVariabel}</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>ChangeStringVar</VARNAME>
+<SOURCE>StringReplacement</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Replace</Param><Value>t</Value></PropertyEntry><PropertyEntry><Param>Replacement</Param><Value>d</Value></PropertyEntry><PropertyEntry><Param>String</Param><Value>{StringCutVar}</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>ListelementVar</VARNAME>
+<SOURCE>StringToken</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Delimiter</Param><Value>;</Value></PropertyEntry><PropertyEntry><Param>Index</Param><Value>4</Value></PropertyEntry><PropertyEntry><Param>String</Param><Value>{SetVariabelList}</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>IsSoftwareXinstalled</VARNAME>
+<SOURCE>InstalledSoftwareInfo</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Name</Param><Value>pcBat TVöD 2026</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>CalcVar</VARNAME>
+<SOURCE>Expression</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Expression</Param><Value>1+1</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>FileAndDirVar</VARNAME>
+<SOURCE>FileInfo</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>FileTimes</Param><Value>0</Value></PropertyEntry><PropertyEntry><Param>Name</Param><Value>C:\Windows\Temp\*.log</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>ProzessVar</VARNAME>
+<SOURCE>ProcessInfo</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Name</Param><Value>OfficeClickToRun.exe</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>XmlVar</VARNAME>
+<SOURCE>XML</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Attribute</Param><Value/></PropertyEntry><PropertyEntry><Param>Default</Param><Value/></PropertyEntry><PropertyEntry><Param>Name</Param><Value>C:\Windows\Enterprise.xml</Value></PropertyEntry><PropertyEntry><Param>Path</Param><Value>&lt;unattend&gt;</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>TextFileVar</VARNAME>
+<SOURCE>TextFile</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Index</Param><Value>2</Value></PropertyEntry><PropertyEntry><Param>Name</Param><Value>C:\Windows\Temp\Help.txt</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="Comment" level="0" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Dateioperationen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Datei(en) kopieren</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="CopyFiles" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<SOURCE>\\svr\D$\Software</SOURCE>
+<DESTINATION>C:\Temp\PDFXChange</DESTINATION>
+<FILES>ProV10_10.7.6.404.x64.msi</FILES>
+<OPTIONS>11</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="CopyFiles" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<SOURCE>\\svr\D$\Software</SOURCE>
+<DESTINATION>C:\Temp\PDFXChange</DESTINATION>
+<FILES>*</FILES>
+<OPTIONS>27</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="CopyFiles" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<SOURCE>{DIP}\Software</SOURCE>
+<DESTINATION>{%systemroot%}\Temp\</DESTINATION>
+<FILES>*.bmp;*.png</FILES>
+<OPTIONS>27</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Datei(en) löschen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="DeleteFiles" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>C:\Windows\Temp\Help.txt</NAME>
+</DATA>
+</ACTION>
+<ACTION type="DeleteFiles" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>{%systemdrive%}\Windows\Temp\Help.txt</NAME>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Verschiebe Datei/Verzeichnis</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="MoveFileOrFolder" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<SOURCE>C:\Windows\Temp\Help.txt</SOURCE>
+<DESTINATION>C:\Temp</DESTINATION>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Verzeichnis erstellen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="CreateFolder" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>C:\Tools</NAME>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Verzeichnis löschen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="DeleteFolder" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>{%systemdrive%}\Tools</NAME>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Shortcut erstellen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="CreateShortcut" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Desktop Shortcut</NAME>
+<FILENAME>C:\Tools\synergo\JUS.cmd</FILENAME>
+<ARGEUMENT></ARGEUMENT>
+<WORKINGDIR></WORKINGDIR>
+<SYMBOL>C:\Tools\synergo\synergo.ico:0</SYMBOL>
+<DESCRIPTION></DESCRIPTION>
+<RELPATH></RELPATH>
+<USERTYPE>0</USERTYPE>
+<LOCATIONTYPE>0</LOCATIONTYPE>
+<SHOWSTYLE>NORMAL</SHOWSTYLE>
+</DATA>
+</ACTION>
+<ACTION type="CreateShortcut" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Startmenü Shortcut</NAME>
+<FILENAME>C:\Tools\synergo\JUS.cmd</FILENAME>
+<ARGEUMENT></ARGEUMENT>
+<WORKINGDIR></WORKINGDIR>
+<SYMBOL>C:\Tools\synergo\synergo.ico:0</SYMBOL>
+<DESCRIPTION></DESCRIPTION>
+<RELPATH></RELPATH>
+<USERTYPE>0</USERTYPE>
+<LOCATIONTYPE>1</LOCATIONTYPE>
+<SHOWSTYLE>NORMAL</SHOWSTYLE>
+</DATA>
+</ACTION>
+<ACTION type="CreateShortcut" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Programme Shortcut</NAME>
+<FILENAME>C:\Tools\synergo\JUS.cmd</FILENAME>
+<ARGEUMENT></ARGEUMENT>
+<WORKINGDIR></WORKINGDIR>
+<SYMBOL>C:\Tools\synergo\synergo.ico:0</SYMBOL>
+<DESCRIPTION></DESCRIPTION>
+<RELPATH></RELPATH>
+<USERTYPE>0</USERTYPE>
+<LOCATIONTYPE>2</LOCATIONTYPE>
+<SHOWSTYLE>NORMAL</SHOWSTYLE>
+</DATA>
+</ACTION>
+<ACTION type="CreateShortcut" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Autoshart Shortcut</NAME>
+<FILENAME>C:\Tools\synergo\JUS.cmd</FILENAME>
+<ARGEUMENT></ARGEUMENT>
+<WORKINGDIR></WORKINGDIR>
+<SYMBOL>C:\Tools\synergo\synergo.ico:0</SYMBOL>
+<DESCRIPTION></DESCRIPTION>
+<RELPATH></RELPATH>
+<USERTYPE>0</USERTYPE>
+<LOCATIONTYPE>3</LOCATIONTYPE>
+<SHOWSTYLE>NORMAL</SHOWSTYLE>
+</DATA>
+</ACTION>
+<ACTION type="CreateShortcut" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Angemeldeter-Benutzer Shortcut</NAME>
+<FILENAME>C:\Tools\synergo\JUS.cmd</FILENAME>
+<ARGEUMENT></ARGEUMENT>
+<WORKINGDIR></WORKINGDIR>
+<SYMBOL>C:\Tools\synergo\synergo.ico:0</SYMBOL>
+<DESCRIPTION></DESCRIPTION>
+<RELPATH></RELPATH>
+<USERTYPE>1</USERTYPE>
+<LOCATIONTYPE>3</LOCATIONTYPE>
+<SHOWSTYLE>NORMAL</SHOWSTYLE>
+</DATA>
+</ACTION>
+<ACTION type="CreateShortcut" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Standardbenutzer Shortcut</NAME>
+<FILENAME>C:\Tools\synergo\JUS.cmd</FILENAME>
+<ARGEUMENT></ARGEUMENT>
+<WORKINGDIR></WORKINGDIR>
+<SYMBOL>C:\Tools\synergo\synergo.ico:0</SYMBOL>
+<DESCRIPTION></DESCRIPTION>
+<RELPATH></RELPATH>
+<USERTYPE>2</USERTYPE>
+<LOCATIONTYPE>3</LOCATIONTYPE>
+<SHOWSTYLE>NORMAL</SHOWSTYLE>
+</DATA>
+</ACTION>
+<ACTION type="CreateShortcut" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Minimiert Shortcut</NAME>
+<FILENAME>C:\Tools\synergo\JUS.cmd</FILENAME>
+<ARGEUMENT></ARGEUMENT>
+<WORKINGDIR></WORKINGDIR>
+<SYMBOL>C:\Tools\synergo\synergo.ico:0</SYMBOL>
+<DESCRIPTION></DESCRIPTION>
+<RELPATH></RELPATH>
+<USERTYPE>2</USERTYPE>
+<LOCATIONTYPE>3</LOCATIONTYPE>
+<SHOWSTYLE>MINIMIZED</SHOWSTYLE>
+</DATA>
+</ACTION>
+<ACTION type="CreateShortcut" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>maximiert Shortcut</NAME>
+<FILENAME>C:\Tools\synergo\JUS.cmd</FILENAME>
+<ARGEUMENT></ARGEUMENT>
+<WORKINGDIR></WORKINGDIR>
+<SYMBOL>C:\Tools\synergo\synergo.ico:0</SYMBOL>
+<DESCRIPTION></DESCRIPTION>
+<RELPATH></RELPATH>
+<USERTYPE>2</USERTYPE>
+<LOCATIONTYPE>3</LOCATIONTYPE>
+<SHOWSTYLE>MAXIMIZED</SHOWSTYLE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Shortcut löschen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="DeleteShortcut" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>C:\Users\Public\Desktop\PDF-XChange Editor.lnk</NAME>
+<USERTYPE>0</USERTYPE>
+<LOCATIONTYPE>0</LOCATIONTYPE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Text in datei schreiben</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="CreateFile" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<FILENAME>C:\Windows\Temp\Help.txt</FILENAME>
+<ENCODING>0</ENCODING>
+<CONTENT>Hallo Das ist ein test</CONTENT>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="CreateFile" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<FILENAME>C:\Windows\Temp\Help.txt</FILENAME>
+<ENCODING>0</ENCODING>
+<CONTENT>Das wird in der textdatei hinzugefügt
+</CONTENT>
+<OPTIONS>2</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="CreateFile" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<FILENAME>C:\Windows\Temp\Help.txt</FILENAME>
+<ENCODING>1</ENCODING>
+<CONTENT>Das ist ein UTF-8 text datei. Wenn es sie schon gibt wird sie nicht überschrieben
+
+</CONTENT>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Datei Herunterladen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="DownloadFile" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<URL>https://ftp.hp.com/pub/softpaq/sp174001-174500/sp174109.exe</URL>
+<FILENAME>C:\Windows\Temp\HP_Probook450G10Biosdriver.exe</FILENAME>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Archiv entpacken</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Unzip" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<FILENAME>C:\Windows\Temp\HP_Probook450G10Biosdriver.zip</FILENAME>
+<TARGET>C:\Tools\</TARGET>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Wert in INI-Datei setzen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="SetIniValue" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<INIFILE>C:\Windows\Temp\Helper.ini</INIFILE>
+<SECTION>t</SECTION>
+<INIVALUENAME>t</INIVALUENAME>
+<VALUE>t</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="0" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Registry bearbeiten</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Registrierungsschlüssel erstellen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="CreateRegKey" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147483650</REGISTRY>
+<REGKEY>SOFTWARE\TestReg</REGKEY>
+</DATA>
+</ACTION>
+<ACTION type="CreateRegKey" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147483649</REGISTRY>
+<REGKEY>SOFTWARE\TestReg</REGKEY>
+</DATA>
+</ACTION>
+<ACTION type="CreateRegKey" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147483648</REGISTRY>
+<REGKEY>SOFTWARE\TestReg</REGKEY>
+</DATA>
+</ACTION>
+<ACTION type="CreateRegKey" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147483651</REGISTRY>
+<REGKEY>.DEFAULT\Test</REGKEY>
+</DATA>
+</ACTION>
+<ACTION type="CreateRegKey" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147483653</REGISTRY>
+<REGKEY>SOFTWARE\TestReg</REGKEY>
+</DATA>
+</ACTION>
+<ACTION type="CreateRegKey" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147484162</REGISTRY>
+<REGKEY>TestReg</REGKEY>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Registrierungsschlüssel löschen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="DeleteRegKey" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147483650</REGISTRY>
+<REGKEY>SOFTWARE\TestReg</REGKEY>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Wert in Registrierung setzen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="SetRegValue" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147483650</REGISTRY>
+<REGKEY>SOFTWARE\Google\Chrome</REGKEY>
+<REGVALUENAME>Test</REGVALUENAME>
+<VALUE>1</VALUE>
+<REGVALUETYPE>4</REGVALUETYPE>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Wert in Registrierung löschen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="DeleteRegValue" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147483650</REGISTRY>
+<REGKEY>SOFTWARE\Google\Chrome</REGKEY>
+<REGVALUENAME>Test</REGVALUENAME>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Registry-Schlüssel aus Datei importieren</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="2" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Beginn Import aus Registry-Datei [C:\Windows\Temp\test.reg]</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="CreateRegKey" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147483650</REGISTRY>
+<REGKEY>SOFTWARE\HPE Aruba Networking</REGKEY>
+</DATA>
+</ACTION>
+<ACTION type="CreateRegKey" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<REGISTRY>2147483650</REGISTRY>
+<REGKEY>SOFTWARE\HPE Aruba Networking\VIA</REGKEY>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="2" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Ende Import aus Registry-Datei [C:\Windows\Temp\test.reg]</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="0" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Dienste steuern</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Dienst Starten</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="StartService" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<TYPE>48</TYPE>
+<SERVICENAME>wuauserv</SERVICENAME>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="StartService" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<TYPE>48</TYPE>
+<SERVICENAME>wuauserv</SERVICENAME>
+<OPTIONS>2</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Dienst beenden</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="StopService" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<TYPE>49</TYPE>
+<SERVICENAME>wuauserv</SERVICENAME>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="StopService" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<TYPE>49</TYPE>
+<SERVICENAME>wuauserv</SERVICENAME>
+<OPTIONS>2</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Dienst löschen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="DeleteService" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<TYPE>50</TYPE>
+<SERVICENAME>wuauserv</SERVICENAME>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="DeleteService" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<TYPE>50</TYPE>
+<SERVICENAME>wuauserv</SERVICENAME>
+<OPTIONS>2</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="0" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Systemfunktionen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Prozess starten</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="LaunchProcess" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<COMMAND>cmd.exe</COMMAND>
+<PARAM>/c exit 0</PARAM>
+<RETURNCODES>*</RETURNCODES>
+<VARNAME>SuccessProcessStart</VARNAME>
+<PIDVARNAME></PIDVARNAME>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="LaunchProcess" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<COMMAND>cmd.exe</COMMAND>
+<PARAM>/c exit 1</PARAM>
+<RETURNCODES>*</RETURNCODES>
+<VARNAME>SuccessProcessStart</VARNAME>
+<PIDVARNAME></PIDVARNAME>
+<OPTIONS>5</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="LaunchProcess" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<COMMAND>cmd.exe</COMMAND>
+<PARAM>/c exit 2</PARAM>
+<RETURNCODES>*</RETURNCODES>
+<VARNAME>SuccessProcessStart</VARNAME>
+<PIDVARNAME></PIDVARNAME>
+<OPTIONS>3</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Prozess terminieren</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="TerminateProcess" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>SearchHost.exe</NAME>
+<OPTIONS>0</OPTIONS>
+<RETURNCODE>0</RETURNCODE>
+</DATA>
+</ACTION>
+<ACTION type="TerminateProcess" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>SearchHost.exe</NAME>
+<OPTIONS>1</OPTIONS>
+<RETURNCODE>0</RETURNCODE>
+</DATA>
+</ACTION>
+<ACTION type="RunEmbeddedCmd" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<SCRIPT>@echo off
+echo Hallo aus dem CMD Demo-Skript &gt; C:\demo_test.txt
+type C:\demo_test.txt</SCRIPT>
+<RETURNCODES>0</RETURNCODES>
+<VARNAME></VARNAME>
+<OPTIONS>1</OPTIONS>
+<HIDDENEXECUTION>1</HIDDENEXECUTION>
+</DATA>
+</ACTION>
+<ACTION type="RunEmbeddedScript" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<SCRIPTLANGUAGE>PowerShell</SCRIPTLANGUAGE>
+<RETURNCODES>0</RETURNCODES>
+<VARNAME></VARNAME>
+<SCRIPT>&quot;Hallo aus dem PowerShell Demo-Skript&quot; | Out-File C:\demo_test.txt
+Get-Content C:\demo_test.txt</SCRIPT>
+<HIDDENEXECUTION>1</HIDDENEXECUTION>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Warten</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Wait" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<TYPE>Duration</TYPE>
+<Properties><PropertyEntry><Param>Duration</Param><Value>15</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="Wait" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<TYPE>ProcessTermination</TYPE>
+<Properties><PropertyEntry><Param>Duration</Param><Value>15</Value></PropertyEntry><PropertyEntry><Param>Process</Param><Value>explorer.exe</Value></PropertyEntry><PropertyEntry><Param>Timeout</Param><Value>120</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>x64 Modus setzen</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="SetX64Mode" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<MODE>1</MODE>
+</DATA>
+</ACTION>
+<ACTION type="SetX64Mode" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<MODE>0</MODE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Tastertur- und Maussperre</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="KeyboardMouseLock" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<KEYBOARDMOUSELOCK>true</KEYBOARDMOUSELOCK></DATA>
+</ACTION>
+<ACTION type="KeyboardMouseLock" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<KEYBOARDMOUSELOCK>false</KEYBOARDMOUSELOCK></DATA>
+</ACTION>
+<ACTION type="Comment" level="0" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Programmfluss</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Kommentar</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Label" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Start</NAME>
+</DATA>
+</ACTION>
+<ACTION type="GotoLabel" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Start</NAME>
+</DATA>
+</ACTION>
+<ACTION type="Subroutine" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Unterroutine</NAME>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="2" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Test für die Unterroutine</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="CreateFile" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<FILENAME>C:\test.txt</FILENAME>
+<ENCODING>1</ENCODING>
+<CONTENT>Das ist eine Textdatei für die Unterroutine</CONTENT>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="CallSubroutine" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Unterroutine</NAME>
+</DATA>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Bedingungsgruppe</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="=" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="&lt;&gt;" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="&gt;" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="&lt;" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="&gt;=" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="&lt;=" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="STARTSWITH" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="ENDSWITH" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="CONTAINS" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="MATCHES" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="DOESNOTMATCH" op2="Vier" options="0"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="=" op2="Vier" options="2"/>
+</ACTION>
+<ACTION type="Conditional" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+</DATA>
+<CONDITION op1="{ListenelementVar}" op="=" op2="Vier" options="3"/>
+</ACTION>
+<ACTION type="Comment" level="1" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>Skript beenden</VALUE>
+</DATA>
+</ACTION>
+<ACTION type="EndBDS" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<RETURNMESSAGE>Fehler</RETURNMESSAGE>
+<RETURNMODESTR>0</RETURNMODESTR>
+<RETURNCODESTR></RETURNCODESTR>
+</DATA>
+</ACTION>
+<ACTION type="EndBDS" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<RETURNMESSAGE>Erfolg</RETURNMESSAGE>
+<RETURNMODESTR>1</RETURNMODESTR>
+<RETURNCODESTR></RETURNCODESTR>
+</DATA>
+</ACTION>
+<ACTION type="EndBDS" level="2" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<RETURNMESSAGE>Erfolg</RETURNMESSAGE>
+<RETURNMODESTR>2</RETURNMODESTR>
+<RETURNCODESTR>EndScriptSuccess</RETURNCODESTR>
+</DATA>
+</ACTION>
+</ACTIONS>
+</baramundiDeployScript>
