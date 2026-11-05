@@ -30,9 +30,12 @@ zusätzlich die Syntax eingebetteter PowerShell-Skripte.
 
 ## Nachschlagen
 
-- `references/aktionen.md` – jede erlaubte Aktion mit exakter XML-Vorlage, Feldern und Optionswerten. Vor dem
-  Schreiben einer Aktion deren Abschnitt lesen; Elementnamen und Reihenfolge exakt übernehmen (auch Eigenheiten
-  wie `ARGEUMENT`).
+- `references/aktionen.md` – jede erlaubte Aktion mit exakter XML-Vorlage, Feldern und Optionswerten. Rund 26 000
+  Tokens, deshalb **nie komplett lesen**: erst das Inhaltsverzeichnis (erste 30 Zeilen), dann je Thema die Zeile der
+  Überschrift suchen (`#### SetVar`, `## 7.`; Dienste unter `### 5.5`) und nur bis zur nächsten Überschrift gleicher
+  Stufe lesen (Read mit offset/limit bzw. `grep -n` und `sed -n`). Für ein neues Skript immer die Grundregeln 1, 2,
+  4 und 5.0, dazu die Abschnitte der verwendeten Aktionen. Elementnamen und Reihenfolge exakt übernehmen (auch
+  Eigenheiten wie `ARGEUMENT`).
 - `references/muster.md` – vollständiges Beispielskript im Hausstil und das Gerüst für eingebettetes PowerShell.
 - `scripts/schema.json` – maschinenlesbare Liste der erlaubten Aktionstypen; was dort fehlt, kennt der Skill nicht.
 
