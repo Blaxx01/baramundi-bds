@@ -191,7 +191,8 @@ function Test-Bds([string]$Text) {
     $unknown = [ordered]@{}
     foreach ($r in $refs) {
         $n = $r[0]
-        if ($defined.ContainsKey($n) -or $n -match '^%.+%$' -or $Schema.builtin_variables -contains $n) { continue }
+        # Kindvariablen wie {Datei.Size} oder {Liste.1.Name} gehoeren zur Variable vor dem ersten Punkt
+        if ($defined.ContainsKey($n) -or $defined.ContainsKey($n.Split('.')[0]) -or $n -match '^%.+%$' -or $Schema.builtin_variables -contains $n) { continue }
         if (@($Schema.variable_prefixes | Where-Object { $n.StartsWith($_, [StringComparison]::OrdinalIgnoreCase) }).Count) { continue }
         $key = if ($r[2]) { "Platzhalter {$n} im Skript" } else { "{$n}" }
         if (-not $unknown.Contains($key)) { $unknown[$key] = New-Object Collections.Generic.List[string] }

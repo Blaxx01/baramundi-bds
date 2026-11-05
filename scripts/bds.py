@@ -201,7 +201,8 @@ def check(text):
             errors.append(f"{aid}: {kind} '{name}' existiert nicht.")
     unknown = {}
     for n, aid, in_script in refs:
-        if n.lower() in defined or re.fullmatch(r"%.+%", n) \
+        # Kindvariablen wie {Datei.Size} oder {Liste.1.Name} gehoeren zur Variable vor dem ersten Punkt
+        if n.lower() in defined or n.split(".")[0].lower() in defined or re.fullmatch(r"%.+%", n) \
                 or n.lower() in (b.lower() for b in SCHEMA["builtin_variables"]) \
                 or any(n.lower().startswith(p.lower()) for p in SCHEMA["variable_prefixes"]):
             continue
