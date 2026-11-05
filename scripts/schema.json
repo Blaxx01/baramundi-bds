@@ -37,7 +37,8 @@
     "Subroutine": ["NAME"],
     "CallSubroutine": ["NAME"],
     "Conditional": [],
-    "EndBDS": ["RETURNMESSAGE", "RETURNMODESTR", "RETURNCODESTR"]
+    "EndBDS": ["RETURNMESSAGE", "RETURNMODESTR", "RETURNCODESTR"],
+    "IncludeBDS": ["FILENAME", "DATERESOLVED", "FILENAMERESOLVED", "RESOLVINGMACHINE", "RESOLVEERROR"]
   },
   "service_types": { "StartService": "48", "StopService": "49", "DeleteService": "50" },
   "evalvar_sources": {
@@ -58,7 +59,7 @@
     "ProcessTermination": ["Duration", "Process", "Timeout"]
   },
   "condition_ops": ["=", "<>", ">", "<", ">=", "<=", "STARTSWITH", "ENDSWITH", "CONTAINS", "MATCHES", "DOESNOTMATCH"],
-  "script_languages": ["PowerShell"],
+  "script_languages": ["PowerShell", "VBScript", "JScript"],
   "builtin_variables": ["DIP", "BMAPATH", "BMSPATH", "Client", "Domain", "Username", "OSType", "Architecture", "Arch",
                         "Mode", "GUIDJob", "GUIDClient", "LCID", "UserLCID", "Reinstall", "FirstInstall", "RegisteredUser", "Group"],
   "variable_prefixes": ["JobParam.", "Client.", "Group.", "Profile.", "Software.", "Job.", "BDScript.", "GUI."]

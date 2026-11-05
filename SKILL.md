@@ -73,6 +73,10 @@ Deutsch: Was das Skript tut (Ablauf in Schritten, mit Aktionsnummern `#n` wie im
 Job-Parameter es erwartet, wie es endet. Danach die Befunde nach Schwere: erst was falsch läuft, dann Risiken, dann
 Stil. Änderungen nur auf Wunsch.
 
+Herstellerskripte von baramundi (Managed Software: `MANAGEDSOFTWAREWRITELOCK` im Kopf, oft älteres Schema wie 2220)
+folgen nicht den Hausregeln, z. B. fehlt der Auffang am Ende. Das als Unterschied zum Hausstil einordnen, nicht als
+Fehler; solche Skripte pflegt der Hersteller, sie werden nicht geändert.
+
 ## Hausregeln
 
 Mit dem Nutzer vereinbart; jede Regel hat einen Grund.

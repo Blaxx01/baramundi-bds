@@ -49,6 +49,11 @@ Webquellen
 - `INFO` = Reiter „Allgemein“ der Skripteigenschaften: Vendor (Hersteller), Name, Version (Skriptversion), Author,
   Comment (Kommentar); selbstschließend, Reihenfolge fest [wahrscheinlich] (t23366). Hausregel: Author fest, Comment = Zweck.
 - `STATICVARS LoadInstallIni="1"` mit leerem `<BMSVars></BMSVars>` unverändert übernehmen [sicher].
+- Weitere Elemente aus baramundis eigenem Installationsskript (Managed Software, Schema 2220):
+  `<MANAGEDSOFTWAREWRITELOCK>True</MANAGEDSOFTWAREWRITELOCK>` in `META` zwischen `INFO` und `STATICVARS`
+  (Schreibschutz für Herstellerskripte – nie erzeugen) und `<RUNOPTIONS HideProgress="1"/>` zwischen `</META>` und
+  `<ACTIONS>` = Skriptfortschrittsfenster ausblenden [wahrscheinlich; HideProgress/RUNOPTIONS stehen auch in
+  BDScript.dll]. Generator: beide weglassen, außer der Nutzer will das Fortschrittsfenster ausblenden.
 
 ### 1.2 Zeilen und Kodierung
 
@@ -91,7 +96,7 @@ Alle 148 ACTION-Elemente der Beispiele haben genau diese 7 Attribute in dieser R
 | `level` | 0, 1, 2 … | Einrückungstiefe [sicher] |
 | `breakpoint` | 0 | Haltepunkt des Studio-Debuggers; immer 0 [wahrscheinlich] |
 | `ignore_error` | 0 / 1 | 1 = „Fehler ignorieren“: Fehlschlag bricht das Skript nicht ab [wahrscheinlich] (t23358) |
-| `comment` | 0 / 1 | Auskommentiert-Flag [wahrscheinlich]: Bei anderen Typen wird die Aktion dann nicht ausgeführt, bei Comment ist es ohne Wirkung. Das Studio des Nutzers schreibt bei Comment immer 1 (38/38), ein Web-Export auch 0. Generator: Comment `1`, sonst `0` |
+| `comment` | 0 / 1 | Auskommentiert-Flag [wahrscheinlich]: Bei anderen Typen wird die Aktion dann nicht ausgeführt, bei Comment ist es ohne Wirkung. Das Studio des Nutzers schreibt bei Comment immer 1 (38/38), baramundis eigenes Installationsskript und ein Web-Export auch 0. Generator: Comment `1`, sonst `0` |
 | `is_included` | 0 | immer 0 [geraten: Kennung für eingebundene Aktionen] |
 | `logging_enabled` | 1 / 0 | 0 = Logging dieser Aktion unterdrücken (Geheimnisse) [wahrscheinlich] (t23327) |
 
@@ -127,7 +132,9 @@ Alle 148 ACTION-Elemente der Beispiele haben genau diese 7 Attribute in dieser R
 - **Job-Parameter** `{JobParam.<Name>}` [sicher]. Voraussetzung: Die .bds ist in der Management Suite angelegt und der
   Parameter dort unter „Konfigurierbare Parameter“ eingetragen; Ja/Nein-Parameter liefern `T` bzw. `F` [sicher, Nutzer].
   Typen: Zeichenkette, Zahl, EIN/AUS-Feld (T/F), Datum, Auswahlliste, Editierbares Auswahlfeld, Dateiname, Zertifikat;
-  dazu eigene Passwort-Parameter, im Job mit * maskiert [sicher, Nutzer]. Fehlt der Parameter, steht wörtlich `{JobParam.<Name>}` im Wert [sicher, Probe].
+  dazu eigene Passwort-Parameter, im Job mit * maskiert [sicher, Nutzer]. Fehlt der Parameter, steht wörtlich `{JobParam.<Name>}` im Wert [sicher, Probe]. Parameternamen dürfen Punkte
+  enthalten, das Präfix ist unabhängig von Groß-/Kleinschreibung (`{jobParam.installDir.barMan}` in baramundis
+  eigenem Skript) [sicher].
 - **Umgebungsvariablen** `{%NAME%}`, z. B. `{%COMPUTERNAME%}`, `{%systemroot%}` [sicher, Probe]. Der Agent ist ein
   32-Bit-Prozess: `{%processor_architecture%}` ist immer x86 [sicher] (W5), `{%ProgramFiles%}` zeigt auf „Program Files (x86)“ –
   vermutlich auch im x64-Modus, der die Prozessumgebung nicht ändert [wahrscheinlich]. 64-Bit-Programmordner daher über
@@ -212,6 +219,8 @@ mit Standard (z. B. Ja/Nein) bekommen stattdessen erst den Standard und dann den
 
 - „Standard“ vergleicht Zahlen numerisch (`10` > `9`; auch `1.10` > `1.9` war wahr), die Stellenzahl ist aber begrenzt
   (t23376) → Versionsnummern mit `options="2"` vergleichen.
+- Leer oder nicht leer prüfen wie baramundi selbst: `op="MATCHES" op2=""` (leer) bzw. `op="DOESNOTMATCH" op2=""`
+  (nicht leer). Für FOUND/NOTFOUND nutzt baramundi ebenfalls `MATCHES`; `=` funktioniert genauso [sicher, Probe].
 - Kein Else: zweite Aktion oder Gruppe mit komplementärem Operator (`=` ↔ `&lt;&gt;`, `&gt;` ↔ `&lt;=`, `MATCHES` ↔
   `DOESNOTMATCH`). UND = verschachtelte Conditional. ODER = Hilfsvariable über mehrere bedingte SetVar, dann eine
   Bedingung darauf. Mehrfachauswahl = je Wert eine bedingte Aktion (z. B. ein EndBDS je Exitcode). Schleife = Sprungmarke →
@@ -262,7 +271,7 @@ Zuordnung Dialogname → XML-Typ über die Abschnittskommentare des US-Autors di
 | Unterroutine / Unterroutine ausführen | Subroutine / CallSubroutine | t23397, t23360 | US Z.767–789 |
 | Bedingungsgruppe | Conditional | t23376 | US Z.795–859 |
 | Skript beenden | EndBDS | t23384 | US Z.865–885; CTU Z.68–115 |
-| bDS einbinden | – (nicht freigegeben, Abschnitt 6) | t23400 | W4 |
+| bDS einbinden | IncludeBDS (5.7) | t23400 | baramundi-Installationsskript, W4 |
 
 Gemeinsame Regeln [sicher, beide Samples]:
 - Standardlayout: `<ACTION …>`, `<DATA>`, je Kindelement eine Zeile `<NAME>Wert</NAME>`, `</DATA>`, optional `<CONDITION …/>`, `</ACTION>`; klassische Feldnamen in GROSSBUCHSTABEN.
@@ -481,6 +490,8 @@ Hinweise FileInfo (t23377): Pfade absolut, Verzeichnisse ohne abschließenden Ba
 ```
 
 - `OPTIONS` immer 0 schreiben; Bedeutung unbekannt, der Doku-Dialog hat keine Option [sicher für 0] (US Z.240). Ein Pfad je Aktion, keine Semikolonliste [sicher] (t23435); Zwischenebenen werden angelegt [wahrscheinlich] (Doku-Beispiel).
+- Ob ein vorhandener Ordner einen Fehler auslöst, ist undokumentiert; baramundi selbst setzt `ignore_error="1"`. Sauberer:
+  vorher FileInfo auf den Ordner und CreateFolder nur bei `NOTFOUND` (Bedingung an der Aktion).
 
 #### DeleteFolder – Verzeichnis löschen (t23431)
 
@@ -735,7 +746,7 @@ Kein eigener Typ: Der Editor liest die .reg-Datei beim Bearbeiten und erzeugt Ei
 
 - Reihenfolge `COMMAND`, `PARAM`, `RETURNCODES`, `VARNAME`, `PIDVARNAME`, `OPTIONS`; kein HIDDENEXECUTION [sicher] (US Z.634–663).
 - `COMMAND` = Kommando (meist .exe, Pfad aus Client-Sicht), `PARAM` = Parameter; gleiche Einträge wie im bMC möglich [sicher] (t23409). Anführungszeichen bei Pfaden mit Leerzeichen: unbekannt.
-- `RETURNCODES` = „Rückgabewerte bei Erfolg“, Dialog-Standard 0 [sicher] (Bild system-functions01.png). `*` = jeder Exitcode gilt als Erfolg [wahrscheinlich] (US, CTU). Mehrere Codes mit `;`, z. B. `0;3010;1641` [wahrscheinlich, nur Web-Quelle W4]. Ein Code außerhalb der Liste lässt die Aktion vermutlich fehlschlagen → Skriptabbruch ohne `ignore_error` [wahrscheinlich].
+- `RETURNCODES` = „Rückgabewerte bei Erfolg“, Dialog-Standard 0 [sicher] (Bild system-functions01.png). `*` = jeder Exitcode gilt als Erfolg [wahrscheinlich] (US, CTU). Mehrere Codes mit Komma, z. B. `0,3010` – so in baramundis eigenem Installationsskript [sicher]; ein Web-Export nutzt `;`. Parameter dort in Variablen vorbereitet und verkettet (`{setupParam}{installdirParam}`), Pfade mit Leerzeichen als `&quot;…&quot;` im Wert. Ein Code außerhalb der Liste lässt die Aktion vermutlich fehlschlagen → Skriptabbruch ohne `ignore_error` [wahrscheinlich].
 - `VARNAME` = „Rückgabewert in Variable“, nur mit „Auf Beendigung warten“; `PIDVARNAME` = „Prozess-ID in Variable“, nur ohne Warten [sicher] (t23409).
 - `OPTIONS`: Bit 1 = Auf Beendigung warten [wahrscheinlich] (alle drei Samples ungerade und mit VARNAME, das Warten voraussetzt). Startverhalten Normal = kein Zusatzbit [wahrscheinlich]. Die Bits 2 und 4 kodieren Minimiert bzw. Unsichtbar, Zuordnung offen; beste Vermutung 2 = Unsichtbar, 4 = Minimiert [geraten] (US: `/c exit 1` mit 5, `/c exit 2` mit 3 – der Autor nummerierte offenbar den Dropdown-Index Normal 0, Minimiert 1, Unsichtbar 2). Generator: 1 (Normal + Warten); für unsichtbare Ausführung besser RunEmbeddedCmd mit HIDDENEXECUTION 1 oder Bit vorher im Studio klären.
 - Warnung: Ohne Warten gestartete Prozesse können nach Jobende weiterlaufen; mit erhöhten Rechten sichtbar oder minimiert gestartete Prozesse kann ggf. ein nicht privilegierter Benutzer steuern [sicher] (t23409).
@@ -790,7 +801,7 @@ Kein eigener Typ: Der Editor liest die .reg-Datei beim Bearbeiten und erzeugt Ei
 ```
 
 - Reihenfolge `SCRIPTLANGUAGE`, `RETURNCODES`, `VARNAME`, `SCRIPT`, `HIDDENEXECUTION`; kein OPTIONS [sicher] (CTU Z.59–67; US Z.694–703).
-- `SCRIPTLANGUAGE` `PowerShell` [sicher]. Sprachen laut Doku: VBScript, PowerShell, PowerShell Core, JavaScript (t23436); deren XML-Werte sind unbekannt.
+- `SCRIPTLANGUAGE` `PowerShell` [sicher]. Weitere Werte laut Programmdateien des Studios: `VBScript`, `JScript` (= JavaScript) [wahrscheinlich]. PowerShell Core ist offenbar kein eigener Wert, sondern eine Zusatzangabe `PowerShellVersion` [wahrscheinlich; genaue Form unbekannt → einmal im Studio anlegen und das XML ansehen].
 - `exit <Code>` beendet das Skript, der Code landet in `VARNAME` [sicher] (t23436). Mit `RETURNCODES` `*` + `VARNAME` + bedingten Folgeaktionen werden Exitcodes ausgewertet [sicher] (CTU). Mit `RETURNCODES` 0 und anderem Exitcode schlägt die Aktion vermutlich fehl → Abbruch [wahrscheinlich].
 - Bitness: nach SetX64Mode 1 läuft 64-Bit-PowerShell, ohne x64-Modus 32-Bit [sicher, Probe]. PowerShell Core wird analog gewählt, bei mehreren Versionen die höchste in der Registry [sicher] (t23436).
 - Der Dialog hat keine Option „Auf Beendigung warten“ → es wird vermutlich immer gewartet [wahrscheinlich] (Bild system-functions05new24R2.png). Im Screenshot mit Sprache VBScript sind „Unsichtbar ausführen“ und die Rückgabefelder ausgegraut – evtl. nur für PowerShell-Varianten wirksam [geraten].
@@ -938,6 +949,28 @@ Prozessbeendigung:
 - Ende des Skripts ohne EndBDS: Status undokumentiert (vermutlich Erfolg) [geraten] → immer ein abschließendes EndBDS.
 
 
+#### IncludeBDS – bDS einbinden (t23400)
+
+```xml
+<ACTION type="IncludeBDS" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<FILENAME>[[Pfad\Include.bds]]</FILENAME>
+<DATERESOLVED>0</DATERESOLVED>
+<FILENAMERESOLVED></FILENAMERESOLVED>
+<RESOLVINGMACHINE></RESOLVINGMACHINE>
+<RESOLVEERROR></RESOLVEERROR>
+</DATA>
+</ACTION>
+```
+
+- XML so in baramundis eigenem Installationsskript (2×) und in einem Web-Export [sicher]. Die Resolve-Felder füllt der
+  Server beim Zusammensetzen; im Quellskript `0` bzw. leer lassen.
+- Der bMS-Server setzt die Skripte vor der Ausführung zusammen; Änderungen im eingebundenen Skript wirken automatisch.
+  Im Pfad keine Laufzeitvariablen, laufzeitabhängiges über Bedingungen [sicher] (t23400). baramundi nutzt einen Pfad
+  relativ zum Skript (`..\..\..\..\customer\<Hersteller>\<Produkt>\preInst.bds`) und `ignore_error="1"`, weil diese
+  Kundenerweiterungen fehlen dürfen.
+- Nur auf ausdrücklichen Wunsch erzeugen – der Nutzer braucht es bisher nicht.
+
 ## 6. Aktionen ohne bekanntes XML (nicht erzeugen)
 
 Für alle folgenden Aktionen gilt: **XML unbekannt – Beispiel aus dem Automation Studio nötig** (Aktion einmal im Studio anlegen, speichern, XML übernehmen). Weder Samples noch vertrauenswürdige Webquellen enthalten XML dafür. Bis dahin die Funktion per RunEmbeddedScript (PowerShell) umsetzen [wahrscheinlich praktikabel].
@@ -959,7 +992,6 @@ Für alle folgenden Aktionen gilt: **XML unbekannt – Beispiel aus dem Automati
 | Freigabe erstellen | t23344, Bild network-shares01.png | Name; Pfad; Kommentar; Benutzerbegrenzung (Maximum / max. N) | |
 | Freigabe verbinden | t23336, Bild network-shares02.png | Server; Freigabe; Laufwerk; persistent; bestehende Verbindung trennen; Benutzeraccount (Name, Kennwort) | im Job laufen SMB-Zugriffe ohnehin über den Netzwerkbenutzer (W15); x64-Modus meiden |
 | Freigabe löschen (Dialog „Freigabe entfernen“) | t23352, Bild network-shares03.png | Freigabe; kein Fehler, wenn Freigabe nicht existiert | |
-| bDS einbinden (IncludeBDS) | t23400 | Dateiname eines .bds | XML nur aus einer Webquelle (W4) bekannt; vom Nutzer nicht freigegeben |
 | GUI-Automatisierung (alle Oberflächenaktionen) | t23343, t23351 ff. | Suchkriterien, Zielelement, Aktion; Aufzeichnungsmodus | aufgezeichnete Aktionen sind von Hand kaum erzeugbar; nicht generieren |
 
 „Registry-Schlüssel aus Datei importieren“ ist kein Laufzeittyp, sondern wird als Einzelaktionen erzeugt (5.4).
@@ -999,7 +1031,7 @@ Grundlage: baramundi-eigener VBScript-Ausdrucksinterpreter, ersetzt die von Micr
 - Schema 2420 läuft nicht auf bMA vor 24R2 [sicher] (W1).
 - Kein Else; Label ohne Bedingung; höchstens eine CONDITION je Aktion [sicher].
 - KeyboardMouseLock wird im Studio-Debug übergangen – Tests im Studio sagen über diese Aktion nichts [sicher] (t23417).
-- Installer per LaunchProcess: `OPTIONS` 1, `RETURNCODES` `0;3010;1641` + `VARNAME`, danach Bedingung auf 3010/1641
+- Installer per LaunchProcess: `OPTIONS` 1, `RETURNCODES` `0,3010,1641` + `VARNAME`, danach Bedingung auf 3010/1641
   (Neustart nötig) [wahrscheinlich, nur Web-Quelle W4].
 - Das ausführende Konto bestimmt der Sicherheitskontext der Applikation (Installationsbenutzer, LocalSystem, …); HKCU ist
   das Profil dieses Kontos [wahrscheinlich] (W14). Benutzereinstellungen besser über das Benutzereinstellungen-bDS der
@@ -1022,8 +1054,8 @@ Ungeklärt; im Zweifel nur die beobachteten Werte verwenden oder im Studio nachs
 6. CreateFile: Verhalten bei `OPTIONS` 0 und vorhandener Datei, Umlaute bei `ENCODING` 0, BOM bei `ENCODING` 1.
 7. SetRegValue: Typcodes außer 1/4, Datenformate (DWORD hex?, Binär, MULTI_SZ), legt `OPTIONS` 1 fehlende Schlüssel an?
    → CreateRegKey davor.
-8. `SCRIPTLANGUAGE`-Werte für PowerShell Core, VBScript, JavaScript.
-9. Skripteigenschaften „Protokollierung“ und „Skriptfortschrittsfenster“ im XML.
+8. Genaue Form der PowerShell-Core-Auswahl (`PowerShellVersion`) in RunEmbeddedScript.
+9. Skripteigenschaft „Protokollierung“ im XML (das Fortschrittsfenster ist `RUNOPTIONS HideProgress`, 1.1).
 10. CopyFiles-Einzelbits außer 11/27 und ob das Zielverzeichnis angelegt wird → CreateFolder davor.
 11. LaunchProcess `COMMAND` mit Leerzeichen: mit oder ohne Anführungszeichen?
 12. DeleteShortcut `NAME`: Bezeichnung oder voller .lnk-Pfad? Eindeutige Alternative: DeleteFiles auf den .lnk-Pfad.
