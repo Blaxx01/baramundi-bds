@@ -24,7 +24,7 @@ SCHEMA = json.loads(Path(__file__).with_name("schema.json").read_text(encoding="
 DECL = '<?xml version="1.0" encoding="ISO-8859-1"?>'
 BOM = "\xef\xbb\xbf"  # UTF-8-BOM, so wie er in Latin-1 gelesen aussieht
 VAR_RE = re.compile(r"\{(%?[A-Za-z_][A-Za-z0-9_.]*%?)\}")
-SECRET_RE = re.compile(r"passw|kennw|secret|token|pwd", re.I)
+SECRET_RE = re.compile(r"passw|kennw|secret|token|pwd|pw$", re.I)
 errors, hints = [], []
 
 
@@ -60,7 +60,7 @@ def check(text):
 
     # Variablennamen ohne Ruecksicht auf Gross-/Kleinschreibung, wie bei baramundi
     defined, cond_vars, exit_vars = set(), set(), {}
-    labels, subs, jumps, refs = set(), set(), [], []
+    labels, subs, jumps, refs, foreign = set(), set(), [], [], []
     x64, stack, prev, last_top = False, {}, -1, None
 
     for i, a in enumerate(actions, 1):
@@ -85,7 +85,7 @@ def check(text):
         elif lvl > prev + 1:
             errors.append(f"{aid}: level springt von {prev} auf {lvl}.")
         elif lvl == prev + 1 and stack.get(prev) not in SCHEMA["containers"]:
-            errors.append(f"{aid}: einruecken geht nur unter Comment, Conditional oder Subroutine (darueber steht {stack.get(prev)}).")
+            hints.append(f"{aid}: eingerueckt unter {stack.get(prev)} - ueblich nur unter Comment, Conditional, Subroutine oder Label; Wirkung unklar.")
         in_body = any(stack.get(lv) in ("Conditional", "Subroutine") for lv in range(lvl))
         stack[lvl], prev = t, lvl
         if not in_body and t not in ("Subroutine", "Comment"):
@@ -93,7 +93,10 @@ def check(text):
 
         # Typ, DATA-Aufbau, CONDITION
         if t not in SCHEMA["actions"]:
-            errors.append(f"{aid}: unbekannter Aktionstyp (erlaubt sind nur die Typen aus schema.json).")
+            if t in SCHEMA["foreign_actions"]:
+                foreign.append(aid)
+            else:
+                errors.append(f"{aid}: unbekannter Aktionstyp (erlaubt sind nur die Typen aus schema.json).")
             continue
         elems = list(a)
         if not elems or elems[0].tag != "DATA":
@@ -104,8 +107,13 @@ def check(text):
             errors.append(f"{aid}: nach DATA ist nur ein CONDITION-Element erlaubt.")
         have, want = ",".join(c.tag for c in data), ",".join(SCHEMA["actions"][t])
         if have != want:
-            errors.append(f"{aid}: DATA enthaelt [{have}], erwartet [{want}] (Namen und Reihenfolge).")
+            if have == ",".join(SCHEMA["legacy_actions"].get(t, [])):
+                hints.append(f"{aid}: aelteres Format ohne HIDDENEXECUTION (vor 24R2) - Option 'Unsichtbar ausfuehren' fehlt.")
+            else:
+                errors.append(f"{aid}: DATA enthaelt [{have}], erwartet [{want}] (Namen und Reihenfolge).")
         cond = a.find("CONDITION")
+        if cond is not None and t in SCHEMA["no_condition"]:
+            errors.append(f"{aid}: {t} unterstuetzt keine Bedingung - dafuer eine Bedingungsgruppe (Conditional) darueber setzen.")
         if cond is not None:
             if cond.get("op") not in SCHEMA["condition_ops"]:
                 errors.append(f'{aid}: Vergleich op="{cond.get("op")}" ist unbekannt.')
@@ -122,6 +130,8 @@ def check(text):
             if v:
                 defined.add(v.lower())
                 names.append(v)
+        if t == "UserInput" and not val(data, "VARNAME"):
+            defined.add("userinput")  # leeres VARNAME = {UserInput}
         if t != "Comment":
             for el in data.iter():
                 for m in VAR_RE.finditer(el.text or ""):
@@ -156,11 +166,12 @@ def check(text):
         if t in ("EvalVar", "Wait"):
             key, table = ("SOURCE", "evalvar_sources") if t == "EvalVar" else ("TYPE", "wait_types")
             kind = val(data, key)
-            got = ",".join(val(pe, "Param") for pe in data.findall("Properties/PropertyEntry"))
+            # Pflichtfelder muessen da sein; Reste anderer Quellen laesst das Studio stehen (harmlos)
+            got = [val(pe, "Param") for pe in data.findall("Properties/PropertyEntry")]
             if kind not in SCHEMA[table]:
                 errors.append(f"{aid}: {key} '{kind}' ist unbekannt.")
-            elif got != ",".join(SCHEMA[table][kind]):
-                errors.append(f"{aid}: Properties [{got}], erwartet [{','.join(SCHEMA[table][kind])}].")
+            elif missing := [p for p in SCHEMA[table][kind] if p not in got]:
+                errors.append(f"{aid}: Properties ohne [{','.join(missing)}] (noetig fuer {kind}).")
         elif t == "SetX64Mode":
             mode = val(data, "MODE")
             if mode in ("0", "1"):
@@ -201,8 +212,9 @@ def check(text):
             errors.append(f"{aid}: {kind} '{name}' existiert nicht.")
     unknown = {}
     for n, aid, in_script in refs:
-        # Kindvariablen wie {Datei.Size} oder {Liste.1.Name} gehoeren zur Variable vor dem ersten Punkt
-        if n.lower() in defined or n.split(".")[0].lower() in defined or re.fullmatch(r"%.+%", n) \
+        # Kindvariablen wie {Datei.Size} oder {Liste.1.Name} gehoeren zu einer gesetzten Variable davor (Name darf Punkte enthalten)
+        parts = n.lower().split(".")
+        if any(".".join(parts[:k]) in defined for k in range(1, len(parts) + 1)) or re.fullmatch(r"%.+%", n) \
                 or n.lower() in (b.lower() for b in SCHEMA["builtin_variables"]) \
                 or any(n.lower().startswith(p.lower()) for p in SCHEMA["variable_prefixes"]):
             continue
@@ -212,6 +224,8 @@ def check(text):
             ids.append(aid)
     for key, ids in unknown.items():
         hints.append(f"{key} ist weder gesetzt noch bekannt und bliebe zur Laufzeit als Text stehen (Tippfehler?): {', '.join(ids)}")
+    if foreign:
+        hints.append(f"GUI-Automatisierung (vom Skill nicht erzeugt, Inhalt ungeprueft): {', '.join(foreign)}")
     for low, (vn, aid) in exit_vars.items():
         if low not in cond_vars:
             hints.append(f"{aid}: Exitcode in {{{vn}}} wird in keiner Bedingung ausgewertet.")

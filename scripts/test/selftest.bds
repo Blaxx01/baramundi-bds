@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<baramundiDeployScript Version="2420" LastChange="05.11.2026 12:00:00">
+<META>
+<INFO Vendor="" Name="Selbsttest" Version="" Author="" Comment="Prueft die Regeln von bds.ps1/bds.py"/>
+<STATICVARS LoadInstallIni="1">
+<BMSVars></BMSVars>
+</STATICVARS>
+</META>
+<ACTIONS>
+<ACTION type="Comment" level="0" breakpoint="0" ignore_error="0" comment="1" is_included="0" logging_enabled="1">
+<DATA>
+<VALUE>#1 Kommentar mit Bedingung: FEHLER</VALUE>
+</DATA>
+<CONDITION op1="{%COMPUTERNAME%}" op="=" op2="X" options="0"/>
+</ACTION>
+<ACTION type="EvalVar" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>a.b</VARNAME>
+<SOURCE>FileInfo</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Extra</Param><Value/></PropertyEntry><PropertyEntry><Param>FileTimes</Param><Value>0</Value></PropertyEntry><PropertyEntry><Param>Name</Param><Value>C:\Windows\Temp\*.log</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="Label" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Schleife</NAME>
+</DATA>
+</ACTION>
+<ACTION type="SetVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>Wert</VARNAME>
+<VALUE>{a.b.1.Name}</VALUE>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="EvalVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>Zeile</VARNAME>
+<SOURCE>TextFile</SOURCE>
+<OPTIONS>0</OPTIONS>
+<Properties><PropertyEntry><Param>Name</Param><Value>{Wert}</Value></PropertyEntry></Properties></DATA>
+</ACTION>
+<ACTION type="UserInput" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<USERINPUTCAPTION>Test</USERINPUTCAPTION><USERINPUTTEXT>Zeile 1&#x0d;&#x0a;Zeile 2</USERINPUTTEXT><VARNAME/><USERINPUTBUTTONS><USERINPUTBUTTONTEXT>OK</USERINPUTBUTTONTEXT></USERINPUTBUTTONS><USERINPUTDEFAULTCHOICE>2</USERINPUTDEFAULTCHOICE><USERINPUTUSETIMEOUT>true</USERINPUTUSETIMEOUT><USERINPUTTIMEOUT>60</USERINPUTTIMEOUT><USERINPUTICON>64</USERINPUTICON></DATA>
+</ACTION>
+<ACTION type="GotoLabel" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<NAME>Schleife</NAME>
+</DATA>
+<CONDITION op1="{UserInput}" op="=" op2="CANCEL" options="0"/>
+</ACTION>
+<ACTION type="SetVar" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="0">
+<DATA>
+<VARNAME>AdminPw</VARNAME>
+<VALUE>{JobParam.AdminPw}</VALUE>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="RunEmbeddedScript" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<SCRIPTLANGUAGE>PowerShell</SCRIPTLANGUAGE>
+<RETURNCODES>0</RETURNCODES>
+<VARNAME></VARNAME>
+<SCRIPT>$p = '{AdminPw}'
+exit 0</SCRIPT>
+</DATA>
+</ACTION>
+<ACTION type="GUIAction" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<CONTROL></CONTROL>
+<ControlPath></ControlPath>
+<TIMEOUT>10</TIMEOUT>
+</DATA>
+</ACTION>
+<ACTION type="LaunchProcess" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<COMMAND>cmd.exe</COMMAND>
+<PARAM>/c exit 0</PARAM>
+<RETURNCODES>0</RETURNCODES>
+<VARNAME></VARNAME>
+<PIDVARNAME></PIDVARNAME>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="SetVar" level="1" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<VARNAME>Fertig</VARNAME>
+<VALUE>ja</VALUE>
+<OPTIONS>0</OPTIONS>
+</DATA>
+</ACTION>
+<ACTION type="EndBDS" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<RETURNMESSAGE>Selbsttest Ende</RETURNMESSAGE>
+<RETURNMODESTR>1</RETURNMODESTR>
+<RETURNCODESTR></RETURNCODESTR>
+</DATA>
+</ACTION>
+</ACTIONS>
+</baramundiDeployScript>

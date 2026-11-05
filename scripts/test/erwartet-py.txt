@@ -1,0 +1,9 @@
+FEHLER: #1 Comment: Comment unterstuetzt keine Bedingung - dafuer eine Bedingungsgruppe (Conditional) darueber setzen.
+FEHLER: #5 EvalVar: Properties ohne [Index] (noetig fuer TextFile).
+HINWEIS: #9 RunEmbeddedScript: aelteres Format ohne HIDDENEXECUTION (vor 24R2) - Option 'Unsichtbar ausfuehren' fehlt.
+HINWEIS: #9 RunEmbeddedScript: verwendet offenbar ein Kennwort/Geheimnis und wird protokolliert - logging_enabled="0" setzen.
+HINWEIS: #9 RunEmbeddedScript: x64-Modus ist aus - PowerShell laeuft als 32-Bit-Prozess.
+HINWEIS: #9 RunEmbeddedScript: PowerShell-Syntax nicht geprueft (nur bds.ps1 unter Windows kann das).
+HINWEIS: #12 SetVar: eingerueckt unter LaunchProcess - ueblich nur unter Comment, Conditional, Subroutine oder Label; Wirkung unklar.
+HINWEIS: GUI-Automatisierung (vom Skill nicht erzeugt, Inhalt ungeprueft): #10 GUIAction
+Ergebnis: 2 Fehler, 6 Hinweise.

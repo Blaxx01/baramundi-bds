@@ -1,6 +1,12 @@
 {
   "version": "2420",
-  "containers": ["Comment", "Conditional", "Subroutine"],
+  "containers": ["Comment", "Conditional", "Subroutine", "Label"],
+  "no_condition": ["Comment", "Label", "Subroutine"],
+  "legacy_actions": {
+    "RunEmbeddedCmd": ["SCRIPT", "RETURNCODES", "VARNAME", "OPTIONS"],
+    "RunEmbeddedScript": ["SCRIPTLANGUAGE", "RETURNCODES", "VARNAME", "SCRIPT"]
+  },
+  "foreign_actions": ["GUIAction"],
   "actions": {
     "Comment": ["VALUE"],
     "ShowMsg": ["FORMAT", "CONTENT", "OPTIONS", "TIMEOUT"],

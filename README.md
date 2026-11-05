@@ -14,6 +14,7 @@ vorher prüft, dazu ein Aktionskatalog mit exakten XML-Vorlagen.
 | `scripts/bds.ps1` | open / save / check unter Windows (inkl. PowerShell-Syntaxprüfung) |
 | `scripts/bds.py` | dieselben Befehle für claude.ai bzw. Linux |
 | `scripts/schema.json` | Regeln für beide Skripte (Aktionstypen, Elementreihenfolge …) |
+| `scripts/test/` | Selbsttest der Prüfregeln (Testskript und erwartete Ausgabe beider Fassungen) |
 | `evals/` | Testfälle im Format von `claude plugin eval` |
 
 ## Installation
@@ -30,3 +31,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\bds.ps1 check <Datei
 ```
 
 Exitcodes: 0 = in Ordnung, 1 = Fehler gefunden, 2 = Aufruf- oder Dateifehler.
+
+## Selbsttest
+
+Nach Änderungen an `bds.ps1`, `bds.py` oder `schema.json` müssen beide Fassungen für `scripts/test/selftest.bds`
+genau die erwartete Ausgabe liefern (keine Ausgabe = kein Unterschied):
+
+```
+powershell -NoProfile -Command "Compare-Object (Get-Content scripts\test\erwartet-ps1.txt) (powershell -NoProfile -ExecutionPolicy Bypass -File scripts\bds.ps1 check scripts\test\selftest.bds)"
+python3 scripts/bds.py check scripts/test/selftest.bds | diff - scripts/test/erwartet-py.txt
+```

@@ -110,6 +110,11 @@ Mit dem Nutzer vereinbart; jede Regel hat einen Grund.
   trotzdem kurz im temporären Skript auf dem Client steht.
 - **Fehlerverhalten:** `ignore_error="1"` nur, wenn ein Fehlschlag ausdrücklich egal ist (z. B. Löschen einer Datei,
   die fehlen darf) – und dann im Kommentar begründen.
+- **Zustand zwischen Läufen:** Muss sich ein Skript etwas bis zum nächsten Lauf merken oder soll ein Ergebnis im bMC
+  sichtbar sein, eine Client-Variable per BMACmd setzen (`aktionen.md` 3.2). Die Variable muss vorher in der bMC
+  angelegt sein – in der Abgabe nennen.
+- **Serverseitige Aktion:** Läuft das Skript auf dem bMS-Server (Jobschritt „Serverseitige Aktion ausführen“), gelten
+  die Regeln aus `aktionen.md` 10: Ablage ohne Unterordner, kein Benutzer, Dauerhaftes mit absolutem Pfad, eigenes Log.
 - **Zeichen:** Nur Zeichen aus ISO-8859-1. Umlaute und ß sind erlaubt; typografische Anführungszeichen („ “),
   Gedankenstrich (–), Euro (€) und Emojis gibt es nicht – `save` lehnt sie ab.
 

@@ -1,7 +1,9 @@
 # Aktionskatalog und Format (.bds, Schema 2420)
 
 Nachschlagewerk zum Schreiben von .bds-Dateien. Grundlage: zwei Beispieldateien des Nutzers (US = UniversalScript.bds,
-Schaudatei fast aller Aktionen; CTU = Check_TaskUser.bds, Produktivskript), die offizielle Doku des Automation Studio
+Schaudatei fast aller Aktionen; CTU = Check_TaskUser.bds, Produktivskript), die Gewinnerskripte der baramundi
+Scripting Days 2025 samt Doku (SD-I = Level Intermediate, Neustart-Erinnerung mit Client-Variablen; SD-P = Level
+Professional, serverseitige Aktion zur Jobzuweisung, bMS 2025.1), die offizielle Doku des Automation Studio
 (bMS 2026R2; `t23428` = Topic-ID), Webquellen (W1 …, Liste am Ende) und ein Probelauf auf dem Testgerät des Nutzers am
 04.11.2026 ([Probe]).
 
@@ -21,6 +23,7 @@ Zeilenangaben wie `US Z.187` verweisen auf die Beispieldateien und dienen nur de
 7. Berechneter Ausdruck (EvalVar `Expression`)
 8. Allgemeine Fallstricke
 9. Offene Punkte
+10. Serverseitige Aktion (SSA) und bConnect
 Webquellen
 
 ## 1. Datei
@@ -58,7 +61,8 @@ Webquellen
 ### 1.2 Zeilen und Kodierung
 
 - ISO-8859-1, jedes Zeichen ein Byte (`ü` = FC). Jede Zeile endet mit CRLF, auch die letzte. Keine Einrückung, keine
-  Tabs, keine Leerzeilen außer in Textwerten, keine XML-Kommentare, kein CDATA, keine `&#…;` [sicher].
+  Tabs, keine Leerzeilen außer in Textwerten, keine XML-Kommentare, kein CDATA [sicher]. `&#…;` nur für Umbrüche in
+  UserInput-Texten (`&#x0d;&#x0a;`, 5.1) – sonst nirgends in 67 Skripten des Nutzers [sicher] (SD-I).
 - Zeichen außerhalb Latin-1 (€ „ “ – …) gibt es nicht; `bds save` lehnt sie ab.
 
 ### 1.3 Escaping
@@ -103,7 +107,11 @@ Alle 148 ACTION-Elemente der Beispiele haben genau diese 7 Attribute in dieser R
 **Einrückung**
 - Kinder = direkt folgende Aktionen mit höherem level bis zur nächsten Aktion mit level ≤ Elternlevel; kein
   End-Marker; Anstiege nur um 1 [sicher].
-- Eltern können Comment (Gliederung), Conditional (bedingter Block) und Subroutine (Rumpf) sein [sicher].
+- Eltern können Comment (Gliederung), Conditional (bedingter Block), Subroutine (Rumpf) und Label (Schleifenrumpf,
+  5.7) sein [sicher] (SD-P und 9 Skripte des Nutzers rücken unter Label ein). Einrückung unter anderen Aktionen
+  (einmal unter LaunchProcess gesehen): Wirkung unbekannt, nicht erzeugen.
+- Comment, Label und Subroutine haben keine Bedingung, das Studio zeigt dort „(nicht unterstützt)“ [sicher]
+  (Studio-Bilder in SD-I) → bedingte Abschnitte immer mit einer Bedingungsgruppe.
 - Unter einem Kommentar eingerückte Aktionen laufen normal – Kommentare taugen als Abschnittsüberschrift [sicher, Probe].
 - Kinder einer Bedingungsgruppe laufen nur bei erfüllter Bedingung; der Rumpf einer Unterroutine wird im normalen
   Ablauf übersprungen und läuft nur per CallSubroutine [sicher, Probe].
@@ -120,10 +128,12 @@ Alle 148 ACTION-Elemente der Beispiele haben genau diese 7 Attribute in dieser R
 
 - Definieren ohne Klammern (`VARNAME`), verwenden als `{Name}`; Groß-/Kleinschreibung egal [sicher, Probe].
 - Werte sind Text; die Ersetzung ist rein textuell und mit Literaltext kombinierbar (`{DIP}\Software`) [sicher].
-- Kindvariablen mit Punkt (`{Prozess.PID}`), Arrays aus Wildcard-Abfragen: `{Var.COUNT}`, `{Var.<Index>.<Kind>}`
-  [sicher] (t23377, t23406); Indexbasis unbekannt.
-- Seit 22R2 stellt der Agent nur Variablen bereit, die wörtlich im Skript stehen; zur Laufzeit zusammengesetzte Namen
-  (`{Var.{i}.Name}`) funktionieren nicht (laut W2 bleiben sie leer; nicht nachgeprüft) → nie verwenden.
+- Kindvariablen mit Punkt (`{Prozess.PID}`), Arrays aus Wildcard-Abfragen: `{Var.Count}`, `{Var.<Index>.<Kind>}`,
+  Index ab 1 [sicher] (t23377, t23406; SD-P zählt von 1 bis `{IniFiles.Count}`).
+- Zusammengesetzte Namen funktionieren bei skriptinternen Variablen: `{IniFiles.{i}.Name}` – die innere Variable wird
+  zuerst ersetzt [sicher] (SD-P, das Log im PDF zeigt die aufgelösten Dateinamen). bMS-Variablen (`{Client.…}`,
+  `{Job.…}`, `{JobParam.…}`, eigene Variablen) stellt der Agent seit 22R2 dagegen nur bereit, wenn sie wörtlich im
+  Skript stehen → für diese nie zusammengesetzte Namen [sicher] (W2).
 - **Unbekannte Variablen und nicht gesetzte Job-Parameter bleiben als Text stehen** (`{GibtEsNicht}`,
   `{JobParam.Fehlt}`), ohne Fehler [sicher, Probe]. Jede verwendete Variable vorher setzen.
 
@@ -146,7 +156,15 @@ Alle 148 ACTION-Elemente der Beispiele haben genau diese 7 Attribute in dieser R
   `{Reinstall}`, `{FirstInstall}`, `{RegisteredUser}`, `{Group}`. Nicht verwenden: `{CDROM}`; veraltet: `{KitsServer}`,
   `{Depot}` (= `{DIP}`).
 - **Benutzerdefinierte bMS-Variablen** `{Bereich.Kategorie.Name}` mit Bereich Client, Group, Profile, Software, Job;
-  Typen Zeichenkette (ohne `'` und `"`), Ein/Aus (T/F), Passwort (verschlüsselt), Zahl [sicher] (W6, W7).
+  Typen Zeichenkette (ohne `'` und `"`), Ein/Aus (T/F), Passwort (verschlüsselt), Zahl, Datum [sicher] (W6, W7, SD-I).
+  - **Client-Variable vom Gerät aus setzen**: LaunchProcess mit BMACmd (Vorlage 5.6),
+    `/Cmd:SetCustomVar /Category:<Kategorie> /Name:<Name> /Value:"<Wert>"`, leeren mit `/Value:""` [sicher] (W17,
+    SD-I). Voraussetzung: Die Variable ist im bMC unter Konfiguration > Variablen angelegt [sicher] (W17). Lesen in
+    späteren Jobs als `{Client.<Kategorie>.<Name>}` [sicher] (SD-I).
+  - Ein/Aus kommt als `T`/`F` an. Datumswerte liest SD-I als `yyyyMMddHHmmss` (es rechnet mit Left/Mid darauf und
+    schreibt selbst `yyyyMMdd000000`) [wahrscheinlich].
+  - Den Wert liefert der Server beim Jobstart. Was das Skript per BMACmd neu setzt, steht erst im nächsten Job in
+    `{Client.…}` → im laufenden Skript mit der eigenen Variable weiterrechnen, wie SD-I [wahrscheinlich].
 - **Status**: `{BDScript.LastResult}` (SUCCESS/FAILED), `{GUI.LastControl}` [sicher] (W8).
 - **Skriptintern**: SetVar, EvalVar, UserInput-Rückgabe (Standard `UserInput`), VARNAME/PIDVARNAME von LaunchProcess
   und RunEmbedded*.
@@ -297,13 +315,13 @@ Gemeinsame Regeln [sicher, beide Samples]:
 
 - `FORMAT` = Typ: 0 Text, 1 HTML, 2 URL, 3 Datei. 2 und 3 [sicher] (US Z.38–47: https-URL bzw. Pfad einer .log-Datei); 0 und 1 [wahrscheinlich] (Index = Dropdown-Reihenfolge in t23373, durch 2 und 3 bestätigt). Widerspruch: Eine Recherche hielt 0/1 für ungeklärt; die Indexlogik gewinnt, weil sie für 2/3 belegt ist.
 - `CONTENT` = Inhalt: Klartext, HTML-Quelltext (escaped), URL oder Dateipfad aus Client-Sicht [sicher] (t23373). „Importieren“ übernimmt den Dateiinhalt ins Feld, „Durchsuchen“ nur den Pfad [sicher] (t23373).
-- `TIMEOUT` = Dauer in Sekunden, mindestens 10; wird immer geschrieben [sicher] (t23373; US: immer 60).
-- `OPTIONS` = Bitmaske. Beobachtet: 47 (Text), 39 (HTML), 63 (URL), 33 (Datei); die Bits 1 und 32 sind immer gesetzt [sicher]. Dialog (Bild user-interaction01.png): Timeout verwenden, Einfluss (verändern / nicht verändern / deaktivieren), Fenster im Vordergrund halten, Skriptausführung sofort fortsetzen.
+- `TIMEOUT` = Dauer in Sekunden, mindestens 10; wird immer geschrieben, ohne Timeout als 0 [sicher] (t23373; US: immer 60; SD-I: 0).
+- `OPTIONS` = Bitmaske. Beobachtet: 47 (Text), 39 (HTML), 63 (URL), 33 (Datei), 32 (Text ohne Timeout, SD-I); Bit 32 ist immer gesetzt [sicher]. Dialog (Bild user-interaction01.png): Timeout verwenden, Einfluss (verändern / nicht verändern / deaktivieren), Fenster im Vordergrund halten, Skriptausführung sofort fortsetzen.
   - 8 = Fenster im Vordergrund halten [wahrscheinlich] (47 und 39 unterscheiden sich nur darin; der Doku-Dialog hat es aktiv).
   - 16 = Skriptausführung sofort fortsetzen [wahrscheinlich] (nur in 63; letzte Option im Dialog).
   - 2+4 = Einfluss: 6 vermutlich „Benutzer kann Timeout verändern“ (Buttons „Moment noch“ und „Timeout abbrechen“), 0 = „nicht verändern“; Kodierung von „deaktivieren“ unbekannt (evtl. nur 4) [geraten].
-  - 1 bzw. 32: einer davon vermutlich „Timeout verwenden“, der andere unbekannt [geraten].
-  - Generator: nur beobachtete Werte. 47 = Standard (Vordergrund, Skript wartet), 39 = ohne Vordergrund, 63 = 47 + sofort fortsetzen, 33 = ohne Einfluss-Bits und Vordergrund [Werte sicher, Deutung geraten].
+  - 1 = Timeout verwenden [wahrscheinlich] (fehlt nur bei 32 mit TIMEOUT 0 in SD-I); 32 unbekannt, immer setzen.
+  - Generator: nur beobachtete Werte. 47 = Standard (Vordergrund, Skript wartet), 39 = ohne Vordergrund, 63 = 47 + sofort fortsetzen, 33 = ohne Einfluss-Bits und Vordergrund [Werte sicher, Deutung geraten]. 32 (wartet ohne Zeitlimit auf „Weiter >“) nur auf ausdrücklichen Wunsch und nie in unbeaufsichtigten Jobs.
 - Laufzeit: Fenster „baramundi Deploy Script“ mit Fortschrittsbalken, je nach Einfluss Buttons „Moment noch“ und „Timeout abbrechen“, immer „Weiter >“ [sicher] (Bild user-interaction02.png). Das Doku-Bildpaar ist kein Beleg für die Einfluss-Kodierung: Der Dialog steht auf „deaktivieren“, das Laufzeitbild zeigt beide Buttons.
 - Braucht einen sichtbaren Desktop: Applikationseinstellung „Sichtbare Ausführung“ nicht auf „Unsichtbar“ [wahrscheinlich] (W16); in Shutdown-Jobs nicht nutzbar, weil dort die sichtbare Ausführung aus sein muss [wahrscheinlich] (W20).
 
@@ -317,12 +335,14 @@ Gemeinsame Regeln [sicher, beide Samples]:
 ```
 
 - Layout: Nach `<DATA>` + CRLF stehen alle Kinder samt `</DATA>` in einer Zeile [sicher] (US Z.54, 58, 62, 66).
-- `USERINPUTCAPTION` = Titel, `USERINPUTTEXT` = Text, `VARNAME` = Rückgabevariable (leer → `UserInput`) [sicher] (Bild user-interaction03.png; t23381). Variablen in allen Texten erlaubt [sicher] (t23381).
-- `USERINPUTBUTTONS`: immer 5 × `USERINPUTBUTTONTEXT` = Schaltfläche 1–5 [sicher]. Ist der Text zur Laufzeit leer, wird die Schaltfläche ausgeblendet [sicher] (t23381). Leere Elemente nie beobachtet; nach der Standardregel `<USERINPUTBUTTONTEXT></USERINPUTBUTTONTEXT>` [wahrscheinlich].
-- `USERINPUTDEFAULTCHOICE` (Rasterzeile „Standard…“, im Bild verdeckt): beobachtet 2 (Timeout an), 10000 (zweimal, Timeout aus), 10002 (Timeout an) [sicher]. Bedeutung unbekannt; Hypothese: Flag +10000 (Bedeutung offen) plus Index 0–4 [geraten]. Generator: UserInput nur auf ausdrücklichen Wunsch und immer mit Timeout (`true` mit dem beobachteten Wert 2) – ohne Timeout kann ein unbeaufsichtigter Job blockieren [geraten]. Wert und Folgebedingungen im Studio prüfen lassen (Abschnitt 9).
+- `USERINPUTCAPTION` = Titel, `USERINPUTTEXT` = Text, `VARNAME` = Rückgabevariable (leer → `UserInput`, geschrieben als `<VARNAME/>`) [sicher] (Bild user-interaction03.png; t23381; SD-I). Variablen in allen Texten erlaubt [sicher] (t23381). Zeilenumbruch im Text als `&#x0d;&#x0a;`, damit alles in einer Zeile bleibt [sicher] (SD-I).
+- `USERINPUTBUTTONS`: je Schaltfläche ein `USERINPUTBUTTONTEXT`, 1 bis 5 Stück [sicher] (US: 5, SD-I: 1 und 3). Ist der Text zur Laufzeit leer, wird die Schaltfläche ausgeblendet [sicher] (t23381). Generator: nur so viele Elemente wie Schaltflächen.
+- **Rückgabe**: Nummer der gedrückten Schaltfläche ab 1; Fenster geschlossen → `CANCEL` [sicher] (SD-I: `{UserInput} = 1` für die einzige Schaltfläche, `DateAdd("d", {UserInput}, Date)` hinter „1 Tag / 2 Tage / 3 Tage“, Rücksprung bei `CANCEL`). Wert nach Ablauf des Timeouts unbekannt.
+- Auswahl erzwingen (nur in betreuten Jobs): Label vor der Abfrage, danach GotoLabel mit Bedingung `{UserInput} = CANCEL` [sicher] (SD-I).
+- `USERINPUTDEFAULTCHOICE` (Rasterzeile „Standard…“, im Bild verdeckt): beobachtet 2 (Timeout an), 10000 (viermal, Timeout aus; US und SD-I), 10002 (Timeout an) [sicher]. Bedeutung unbekannt; Hypothese: Flag +10000 (Bedeutung offen) plus Index 0–4 [geraten]. Generator: UserInput nur auf ausdrücklichen Wunsch und immer mit Timeout (`true` mit dem beobachteten Wert 2) – ohne Timeout kann ein unbeaufsichtigter Job blockieren [geraten]. Wert und Folgebedingungen im Studio prüfen lassen (Abschnitt 9).
 - `USERINPUTUSETIMEOUT` `true`/`false`, `USERINPUTTIMEOUT` Sekunden (auch bei false geschrieben) [sicher] (US Z.58, 66). Die Restzeit steht im Titel („Titel - 42 s“) [sicher] (Bild user-interaction03.png).
 - `USERINPUTICON` 16 Stop, 32 Frage, 48 Warnung, 64 Information (MessageBox-Konstanten) [sicher]. Wert für „kein Icon“ unbekannt.
-- Inhalt der Rückgabevariable (Text oder Nummer der Schaltfläche, Wert bei Timeout) ist undokumentiert → offen (Abschnitt 9). Höchstens 5 Schaltflächen [sicher].
+- Höchstens 5 Schaltflächen [sicher]. Die Antwort mit Bedingungen auf die Nummer auswerten, plus Auffang für `CANCEL` und Timeout.
 
 ### 5.2 Variablen
 
@@ -357,21 +377,21 @@ Gemeinsame Regeln [sicher, beide Samples]:
 - Layout: `VARNAME`, `SOURCE`, `OPTIONS` je eine Zeile, danach `<Properties>…</Properties></DATA>` in einer Zeile [sicher] (US Z.95–171, 11×).
 - PropertyEntry-Einträge stehen alphabetisch nach `Param`, nicht in Dialogreihenfolge (alle 13 Properties-Blöcke in US, inkl. Wait) [sicher]. Ob Pflicht, ist unbekannt → nachbilden. Leerer Wert = `<Value/>` [sicher] (US Z.163).
 - `OPTIONS`: immer 0 beobachtet; 1 = „Existierende Variable nicht überschreiben“ analog SetVar [geraten] (Checkbox in allen Screenshots determine-variables*).
-- Verhalten, wenn nichts gefunden wird (Registry-Wert, INI-Parameter, XML-Knoten, Textzeile, Index außerhalb), ist undokumentiert.
+- Nichts gefunden: Registry-Wert fehlt → `NOTFOUND` [sicher] (SD-I, Bedingung `<> NOTFOUND`); Zeile hinter dem Dateiende → `NOTFOUND` [sicher] (SD-P, Schleifenende); fehlender INI-Parameter → leer laut Annahme von SD-P [geraten] → auf leer und `NOTFOUND` prüfen; XML-Knoten unbekannt.
 
 | SOURCE | Dialog-Quelle | Params → Dialogfeld | Ergebnis, Hinweise |
 |---|---|---|---|
-| Registry | Registrierung (t23414) | Key = Schlüssel ohne Hive; Registry = Hive als **Text**; Value = Wertname | Daten des Werts. Hive-Text belegt für HKEY_LOCAL_MACHINE (US Z.100) und HKEY_CURRENT_USER (Bild determine-variables01.png) [sicher], übrige analog [wahrscheinlich]. 64-Bit-Zweig nur mit vorherigem SetX64Mode 1 [sicher] (t23414). |
-| IniFile | INI-Datei (t23382) | File, Param (Parameter), Section (Sektion) | Wert des Parameters [sicher] |
+| Registry | Registrierung (t23414) | Key = Schlüssel ohne Hive; Registry = Hive als **Text**; Value = Wertname | Daten des Werts, fehlt er: `NOTFOUND` [sicher] (SD-I). Mehrteilige Werte (REG_MULTI_SZ wie PendingFileRenameOperations) lassen sich mit CONTAINS durchsuchen [sicher] (SD-I). Hive-Text belegt für HKEY_LOCAL_MACHINE (US Z.100) und HKEY_CURRENT_USER (Bild determine-variables01.png) [sicher], übrige analog [wahrscheinlich]. 64-Bit-Zweig nur mit vorherigem SetX64Mode 1 [sicher] (t23414). |
+| IniFile | INI-Datei (t23382) | File, Param (Parameter), Section (Sektion) | Wert des Parameters [sicher]. INI-Datei als ANSI speichern, sonst kommen Umlaute falsch an [wahrscheinlich] (Doku zu SD-P). |
 | SubString | Teilstring (t23427) | Length, Start, String | Startposition vermutlich 0-basiert (Doku-Bild: „baramundi“, Start 0, Länge 4) [geraten] |
 | StringReplacement | Ersetzung in Zeichenkette (t23422) | Replace (zu ersetzen), Replacement (ersetzen mit), String | ersetzt vermutlich alle Vorkommen; Groß-/Kleinschreibung unbekannt [geraten] |
 | StringToken | Listenelement (t23398) | Delimiter, Index, String | Index 1-basiert [sicher] (t23398: 1 = erstes Element). Widerspruch zu einer Recherche, die nur aus US „niedrig“ ableitete: die Doku gewinnt. |
 | InstalledSoftwareInfo | Installierte Software Infos (t23390) | Name = Anzeigename; `*` `?` → Array | FOUND/NOTFOUND; Kinder je nach Daten: .DisplayName, .DisplayVersion, .InstallDate (yyyyMMdd), .InstallSource, .Key (Uninstall-Schlüssel), .Language (LCID), .Publisher, .SystemComponent, .UninstallString [sicher] (Bild determine-variables08.png). 32/64-Bit-Uninstall-Zweig: unbekannt. |
 | Expression | Berechneter Ausdruck (t23430) | Expression | Ergebnis des Ausdrucks (Abschnitt 7). „Expression“ = neuer baramundi-Interpreter, nicht „VBS (veraltet)“ [wahrscheinlich] (US folgt der Quellenreihenfolge von t23415 und lässt genau „VBS (veraltet)“ und „Abbilddatei“ aus). |
-| FileInfo | Datei- und Verzeichnisinformationen (t23377) | FileTimes (Zeitstempel: 0/1), Name | immer FOUND/NOTFOUND; Kinder u. a. .Attribs, .Company, .Description, .FileName, .FileVersion, .InternalVersion, .Language, .Name (voller Pfad), .OriginalFilename, .Path, .ProductName, .ProductVersion, .Size, .Version [sicher] (Bild determine-variables10a.png). FileTimes 1 = an [wahrscheinlich]; Namen der Zeitstempel-Kinder unbekannt. |
+| FileInfo | Datei- und Verzeichnisinformationen (t23377) | FileTimes (Zeitstempel: 0/1), Name | immer FOUND/NOTFOUND; Kinder u. a. .Attribs, .Company, .Description, .FileName, .FileVersion, .InternalVersion, .Language, .Name (voller Pfad), .OriginalFilename, .Path, .ProductName, .ProductVersion, .Size, .Version [sicher] (Bild determine-variables10a.png). FileTimes 1 = an [wahrscheinlich]; Namen der Zeitstempel-Kinder unbekannt. Mit Wildcard (`{Ordner}\**\*.ini`, `**` = auch Unterordner) eine Liste: `{Var}` FOUND/NOTFOUND, `{Var.Count}`, `{Var.<n>.Name}` (voller Pfad), `{Var.<n>.FileName}` (nur Dateiname), n ab 1 [sicher] (SD-P). |
 | ProcessInfo | Prozessinformationen (t23406) | Name = Prozessname oder PID | immer FOUND/NOTFOUND; .Account, .CPU (%), .CommandLine, .Created (dd.MM.yyyy HH:mm:ss), .Created.Date (yyyyMMdd), .Created.Time (HHmmss), .Filename, .PID, .WorkingSetSize [sicher]. Alle Instanzen nur mit angehängter Wildcard (`explorer.exe*`) → Array [sicher]. |
 | XML | XML (t23333) | Attribute (optional), Default, Name (Datei), Path | Path als Schrägstrichpfad ab Wurzel, ohne führenden `/` und ohne Namespace-Präfix (`unattend/settings/component`) [wahrscheinlich] (Bild determine-variables13.png). Default gilt bei fehlendem Attribut [sicher]. Ergebnis ohne Attribut (Elementtext?) unbekannt. |
-| TextFile | Textdatei (t23326) | Index (Zeilennummer, leer = ganze Datei), Name | Zählbasis der Zeilen unbekannt. Das in t23326 genannte Feld „XML-Pfad“ fehlt im Dialog (Bild determine-variables14.png) → Kopierfehler der Doku [wahrscheinlich]. |
+| TextFile | Textdatei (t23326) | Index (Zeilennummer, leer = ganze Datei), Name | Zeilen ab 1; hinter der letzten Zeile `NOTFOUND` [sicher] (SD-P: Schleife über alle Zeilen, 5.7). Das in t23326 genannte Feld „XML-Pfad“ fehlt im Dialog (Bild determine-variables14.png) → Kopierfehler der Doku [wahrscheinlich]. |
 
 Properties-Zeilen (exakt, alphabetisch):
 
@@ -420,7 +440,7 @@ TextFile:
 <Properties><PropertyEntry><Param>Index</Param><Value>[[Zeile]]</Value></PropertyEntry><PropertyEntry><Param>Name</Param><Value>[[Pfad.txt]]</Value></PropertyEntry></Properties></DATA>
 ```
 
-Hinweise FileInfo (t23377): Pfade absolut, Verzeichnisse ohne abschließenden Backslash; Wildcards erzeugen ein Array und dürfen laut Doku nur am Ende stehen, zugleich nennt die Doku für rekursive Suche „Wildcard im Pfad plus festen Dateinamen“ → Doku widersprüchlich [sicher als Doku-Aussage]. Für Versionsvergleiche `.Version` (normalisiert, z. B. 2007.100.1600.22) statt `.FileVersion` (Rohtext mit Zusätzen) [wahrscheinlich] (Bild determine-variables10a.png). Ohne x64-Modus landen System32-Pfade vermutlich in SysWOW64 [wahrscheinlich] (t23432). Der Screenshot in t23377 zeigt fälschlich den Ausdrucksdialog.
+Hinweise FileInfo (t23377): Pfade absolut, Verzeichnisse ohne abschließenden Backslash; Wildcards erzeugen ein Array. Die Doku ist zur Lage der Wildcard widersprüchlich; belegt ist `{Ordner}\**\*.ini`: findet die Dateien im Ordner und in allen Unterordnern, auch mit Umlauten im Namen [sicher] (SD-P). Für Versionsvergleiche `.Version` (normalisiert, z. B. 2007.100.1600.22) statt `.FileVersion` (Rohtext mit Zusätzen) [wahrscheinlich] (Bild determine-variables10a.png). Ohne x64-Modus landen System32-Pfade vermutlich in SysWOW64 [wahrscheinlich] (t23432). Der Screenshot in t23377 zeigt fälschlich den Ausdrucksdialog.
 
 ### 5.3 Dateioperationen
 
@@ -561,9 +581,12 @@ Hinweise FileInfo (t23377): Pfade absolut, Verzeichnisse ohne abschließenden Ba
 ```
 
 - Reihenfolge `FILENAME`, `ENCODING`, `CONTENT`, `OPTIONS` [sicher] (US Z.387–413, 777–784).
-- `ENCODING`: Dialoglabel „ASCII“ bzw. „UTF8“; 1 = UTF8 [wahrscheinlich] (US-Text „UTF-8 text datei“ bei 1, Doku-Reihenfolge), 0 = ASCII [wahrscheinlich]. Was ASCII mit Umlauten macht und ob UTF8 ein BOM schreibt, ist unbekannt → bei Nicht-ASCII-Text 1 verwenden. Widerspruch: eine Recherche nannte 0 „ANSI“; das Doku-Label „ASCII“ gewinnt, das Byteverhalten bleibt offen.
-- `OPTIONS`: 1 = überschreiben, falls vorhanden [wahrscheinlich] (einzige Checkbox im alten Dialog, Bild file-operations08.png; Doku-Beispiel überschreibt); 0 = nicht überschreiben [wahrscheinlich] (US-Text Z.408); 2 = anhängen [wahrscheinlich] (US-Text „hinzugefügt“ Z.399, undokumentiert). Widerspruch Dialog (nur Checkbox) gegen Sample (drei Werte): das neuere Sample gewinnt. Verhalten bei 0 und vorhandener Datei (Fehler oder still) unbekannt. 3 nie beobachtet → nicht verwenden.
+- `ENCODING`: Dialoglabel „ASCII“ bzw. „UTF8“; 1 = UTF8 [wahrscheinlich] (US-Text „UTF-8 text datei“ bei 1, Doku-Reihenfolge), 0 = „ASCII“. Mit 0 kommen Umlaute lesbar an [wahrscheinlich] (SD-P schreibt sein Log mit 0, im PDF steht „SW für alle.ini“ korrekt) – vermutlich ANSI, die genauen Bytes und ein BOM bei 1 sind ungeprüft.
+- `OPTIONS`: 1 = überschreiben, falls vorhanden [wahrscheinlich] (einzige Checkbox im alten Dialog, Bild file-operations08.png; Doku-Beispiel überschreibt); 0 = nicht überschreiben [wahrscheinlich] (US-Text Z.408); 2 = anhängen, legt die Datei beim ersten Mal an [sicher] (US-Text „hinzugefügt“ Z.399; SD-P schreibt so ein ganzes Log, Ergebnis im PDF). Widerspruch Dialog (nur Checkbox) gegen Sample (drei Werte): das neuere Sample gewinnt. Verhalten bei 0 und vorhandener Datei (Fehler oder still) unbekannt. 3 nie beobachtet → nicht verwenden.
 - Zeilenumbrüche in `CONTENT` als CRLF; ein Schlussumbruch gehört zum Inhalt (beim Anhängen sinnvoll).
+- Muster Log ohne PowerShell (SD-P): Unterroutine „Log schreiben“ mit EvalVar `Zeit` ← Expression `Now()` und
+  CreateFile `OPTIONS` 2, `CONTENT` = `{Zeit}: {Meldung}` + CRLF; Aufruf nach SetVar `Meldung`. Den Dateinamen einmal
+  am Anfang bilden (Zeitstempel ohne `:` und `/`, 7).
 
 #### DownloadFile – Datei herunterladen (t23447)
 
@@ -745,11 +768,28 @@ Kein eigener Typ: Der Editor liest die .reg-Datei beim Bearbeiten und erzeugt Ei
 ```
 
 - Reihenfolge `COMMAND`, `PARAM`, `RETURNCODES`, `VARNAME`, `PIDVARNAME`, `OPTIONS`; kein HIDDENEXECUTION [sicher] (US Z.634–663).
-- `COMMAND` = Kommando (meist .exe, Pfad aus Client-Sicht), `PARAM` = Parameter; gleiche Einträge wie im bMC möglich [sicher] (t23409). Anführungszeichen bei Pfaden mit Leerzeichen: unbekannt.
+- `COMMAND` = Kommando (meist .exe, Pfad aus Client-Sicht), `PARAM` = Parameter; gleiche Einträge wie im bMC möglich [sicher] (t23409). Pfade mit Variablen oder Leerzeichen in Anführungszeichen: `<COMMAND>&quot;{BMAPath}\BMACmd.exe&quot;</COMMAND>` [sicher] (SD-I, 13×); fester Pfad ohne Leerzeichen geht ohne (`C:\Windows\System32\shutdown.exe`, SD-I).
 - `RETURNCODES` = „Rückgabewerte bei Erfolg“, Dialog-Standard 0 [sicher] (Bild system-functions01.png). `*` = jeder Exitcode gilt als Erfolg [wahrscheinlich] (US, CTU). Mehrere Codes mit Komma, z. B. `0,3010` – so in baramundis eigenem Installationsskript [sicher]; ein Web-Export nutzt `;`. Parameter dort in Variablen vorbereitet und verkettet (`{setupParam}{installdirParam}`), Pfade mit Leerzeichen als `&quot;…&quot;` im Wert. Ein Code außerhalb der Liste lässt die Aktion vermutlich fehlschlagen → Skriptabbruch ohne `ignore_error` [wahrscheinlich].
 - `VARNAME` = „Rückgabewert in Variable“, nur mit „Auf Beendigung warten“; `PIDVARNAME` = „Prozess-ID in Variable“, nur ohne Warten [sicher] (t23409).
 - `OPTIONS`: Bit 1 = Auf Beendigung warten [wahrscheinlich] (alle drei Samples ungerade und mit VARNAME, das Warten voraussetzt). Startverhalten Normal = kein Zusatzbit [wahrscheinlich]. Die Bits 2 und 4 kodieren Minimiert bzw. Unsichtbar, Zuordnung offen; beste Vermutung 2 = Unsichtbar, 4 = Minimiert [geraten] (US: `/c exit 1` mit 5, `/c exit 2` mit 3 – der Autor nummerierte offenbar den Dropdown-Index Normal 0, Minimiert 1, Unsichtbar 2). Generator: 1 (Normal + Warten); für unsichtbare Ausführung besser RunEmbeddedCmd mit HIDDENEXECUTION 1 oder Bit vorher im Studio klären.
 - Warnung: Ohne Warten gestartete Prozesse können nach Jobende weiterlaufen; mit erhöhten Rechten sichtbar oder minimiert gestartete Prozesse kann ggf. ein nicht privilegierter Benutzer steuern [sicher] (t23409).
+
+BMACmd – Client-Variable setzen (3.2) [sicher] (W17, SD-I):
+
+```xml
+<ACTION type="LaunchProcess" level="0" breakpoint="0" ignore_error="0" comment="0" is_included="0" logging_enabled="1">
+<DATA>
+<COMMAND>&quot;{BMAPath}\BMACmd.exe&quot;</COMMAND>
+<PARAM>/Cmd:SetCustomVar /Category:[[Kategorie]] /Name:[[Name]] /Value:&quot;{[[Variable]]}&quot;</PARAM>
+<RETURNCODES>0</RETURNCODES>
+<VARNAME></VARNAME>
+<PIDVARNAME></PIDVARNAME>
+<OPTIONS>1</OPTIONS>
+</DATA>
+</ACTION>
+```
+
+- Wert immer in Anführungszeichen (W17: Parameter mit Leerzeichen in Anführungszeichen); leeren mit `/Value:&quot;&quot;`. BMACmd braucht keine erhöhten Rechte [sicher] (W17). Rückgabewerte laut W17 (dort beim Kommando OpenKiosk): 0 = Erfolg, 1 = Kommunikationsfehler bMA/BMACmd, 2 = bMA nicht erreichbar, 3 = bServer nicht erreichbar [wahrscheinlich auch für SetCustomVar]. Weitere Kommandos: `/Cmd:Log /Type:<1|2|4> /Text:"<Text>"` (Eintrag im Serverlog; 1 Information, 2 Warnung, 4 Fehler), `/Cmd:RestartJob /Job:"<Name>"` (nur für bereits zugewiesene Jobs) [sicher] (W17).
 
 #### TerminateProcess – Prozess beenden (t23434)
 
@@ -889,6 +929,23 @@ Prozessbeendigung:
 - Namen müssen eindeutig sein; Aktionen zwischen GotoLabel und Ziel werden übersprungen [sicher] (t23408, t23392). Label unterstützt keine Bedingung [sicher] (Bild program-flow03.png).
 - Rücksprung ohne Bedingung = Endlosschleife (US Z.757–766). Zählvariable vor der Marke initialisieren; sonst liefert `{i}+1` beim ersten Durchlauf vermutlich eine Fehlermarke [wahrscheinlich].
 - Die Fehlerliste meldet Sprünge ohne passende Marke [sicher] (t23350).
+- Der Schleifenrumpf darf eine Stufe tiefer unter der Marke stehen, das GotoLabel auf der Stufe der Marke – so ist
+  die Schleife im Studio auf- und zuklappbar [sicher] (SD-P). Muster:
+
+```
+Über Zeilen einer Textdatei (SD-P)          Über gefundene Dateien (SD-P)
+SetVar i = 1                                EvalVar Liste ← FileInfo {Ordner}\**\*.ini
+Label „Zeile lesen“                         Conditional {Liste} = FOUND
+  EvalVar Zeile ← TextFile {Datei}, {i}       SetVar i = 1
+  Conditional {Zeile} <> NOTFOUND             Label „Datei verarbeiten“
+    … {Zeile} verarbeiten …                     … {Liste.{i}.Name} verarbeiten …
+    EvalVar i ← Expression {i}+1                EvalVar i ← Expression {i}+1
+GotoLabel „Zeile lesen“                       GotoLabel „Datei verarbeiten“
+  [Bedingung {Zeile} <> NOTFOUND]               [Bedingung {i} <= {Liste.Count}]
+```
+
+- Lauf in zwei Durchgängen (SD-P): Marke ganz oben, am Ende Modus-Variable umschalten und per GotoLabel mit
+  Bedingung auf den alten Modus zurückspringen.
 
 #### Subroutine / CallSubroutine – Unterroutine, Unterroutine ausführen (t23397, t23360)
 
@@ -909,7 +966,8 @@ Prozessbeendigung:
 ```
 
 - Rumpf = direkt folgende Aktionen mit level+1 [sicher] (t23397; US Z.767–784). Definieren allein reicht nicht, die Unterroutine muss aufgerufen werden; nach dem Aufruf geht es mit der Aktion nach CallSubroutine weiter [sicher] (t23360).
-- Der normale Ablauf überspringt den Rumpf einer im Fluss stehenden Definition; er läuft nur per CallSubroutine [sicher, Probe]. Platzierung daher frei – im Hausstil vor dem ersten Aufruf.
+- Der normale Ablauf überspringt den Rumpf einer im Fluss stehenden Definition; er läuft nur per CallSubroutine [sicher, Probe]. Platzierung daher frei – im Hausstil vor dem ersten Aufruf. Beide Gewinnerskripte sammeln die Unterroutinen stattdessen hinter dem abschließenden EndBDS; auch das funktioniert [sicher] (SD-I, SD-P).
+- CallSubroutine darf eine Bedingung haben (bedingter Aufruf), Subroutine selbst nicht [sicher] (SD-I).
 - Keine Parameter und keine Rückgabewerte; Datenaustausch nur über Variablen [wahrscheinlich] (Bilder program-flow05.png, -06.png zeigen nur den Namen).
 
 #### Conditional – Bedingungsgruppe (t23376)
@@ -1021,15 +1079,27 @@ Grundlage: baramundi-eigener VBScript-Ausdrucksinterpreter, ersetzt die von Micr
 - **Fehler** brechen nichts ab: Die Variable erhält eine Markierungszeichenfolge, laut deutscher Doku `<Ungültiger Ausdruck>` (Laufzeittext evtl. englisch, ungeprüft) [sicher für das Prinzip] (t23323). Ursachen: Division durch 0, Typkonflikt, Null in Arithmetik, Überlauf (`CByte(256)`, `CInt(40000)`), ungültiges Argument (`Sqr(-1)`, `Log(0)`, `Chr(256)`), unbekannte Funktion, mehr als 100 Ebenen. Prüfung sprachunabhängig per Bedingung `op="STARTSWITH" op2="&lt;"` [wahrscheinlich].
 - **Variablen im Ausdruck**: `{Name}` wird textuell eingesetzt (`{Zaehler}+1`); Textwerte in Anführungszeichen setzen (`UCase("{Name}")`); ein `"` im Wert bricht den Ausdruck [wahrscheinlich] (t23438; Bild determine-variables09.png). In der Datei: `"` → `&quot;`, `&` → `&amp;`, `<`/`>` → `&lt;`/`&gt;`.
 - **Empfehlungen**: MsgBox/InputBox nicht verwenden (blockieren im unbeaufsichtigten Kontext; für Dialoge UserInput) [geraten]; „VBS (veraltet)“ nie erzeugen [sicher] (t23430).
+- **Bewährte Ausdrücke** aus den Gewinnerskripten [sicher] (SD-I, SD-P); in der Datei `&` → `&amp;`, `"` → `&quot;`:
+
+| Zweck | Ausdruck | Ergebnis |
+|---|---|---|
+| Zähler | `{i}+1` | 2 |
+| Datum sortierbar | `Year(Now) & Right("0" & Month(Now),2) & Right("0" & Day(Now),2)` | 20250925 |
+| Zeitstempel für Logzeilen | `Now()` | 25.09.2025 14:34:22 |
+| Zeitstempel für Dateinamen | `Date() & " " & FormatDateTime(Now(), 4)`, danach `:` und `/` per StringReplacement ersetzen | 25.09.2025 14_34 |
+| Datum in n Tagen | `DateAdd("d", {n}, Date)` | 28.09.2025 |
+| Tage zwischen zwei yyyyMMdd-Werten | `CDate(Left({B},4) & "/" & Mid({B},5,2) & "/" & Mid({B},7,2)) - CDate(Left({A},4) & "/" & Mid({A},5,2) & "/" & Mid({A},7,2))` | 3 |
+| Text anhängen | `"{Grund}" & "Treiber "` | bisheriger Text + „Treiber “ |
 ## 8. Allgemeine Fallstricke
 - 32-Bit-Prozess: Registry- und Dateisystem-Umleitung (WOW6432Node, SysWOW64), `{%processor_architecture%}` = x86 [sicher]; x64-Modus behebt das, kann aber Netzwerkzugriffe stören (t23432). 64-Bit-Programmordner über `{%ProgramW6432%}` (3.2).
-- Variablen nur wörtlich (seit 22R2), keine verschachtelten Namen [sicher] (W2).
+- bMS-Variablen nur wörtlich (seit 22R2); zusammengesetzte Namen wie `{Liste.{i}.Name}` nur für skriptinterne
+  Variablen (3.1) [sicher] (W2, SD-P).
 - EvalVar/Registry: Hive als Text; Registry-Aktionen: Hive als Zahl [sicher].
 - `ARGEUMENT` mit Tippfehler; `RETURNCODE` (TerminateProcess) Singular; `RETURNMODESTR` enthält eine Zahl [sicher].
 - CopyFiles ohne Überschreiben überspringt still; DownloadFile ohne Überschreiben bricht ab [sicher] (t23428, t23447).
 - Berechneter Ausdruck bricht bei Fehlern nicht ab, sondern liefert eine Fehlermarke [sicher] (t23323).
 - Schema 2420 läuft nicht auf bMA vor 24R2 [sicher] (W1).
-- Kein Else; Label ohne Bedingung; höchstens eine CONDITION je Aktion [sicher].
+- Kein Else; Comment, Label und Subroutine ohne Bedingung; höchstens eine CONDITION je Aktion [sicher].
 - KeyboardMouseLock wird im Studio-Debug übergangen – Tests im Studio sagen über diese Aktion nichts [sicher] (t23417).
 - Installer per LaunchProcess: `OPTIONS` 1, `RETURNCODES` `0,3010,1641` + `VARNAME`, danach Bedingung auf 3010/1641
   (Neustart nötig) [wahrscheinlich, nur Web-Quelle W4].
@@ -1046,19 +1116,57 @@ Ungeklärt; im Zweifel nur die beobachteten Werte verwenden oder im Studio nachs
 
 1. LaunchProcess `OPTIONS` 2/4: welches Bit startet unsichtbar, welches minimiert (Vermutung 2 = unsichtbar)?
    Für unsichtbare Ausführung RunEmbeddedCmd/RunEmbeddedScript mit `HIDDENEXECUTION` 1 nehmen.
-2. ShowMsg `OPTIONS`: Bedeutung von Bit 1 und 32, Kodierung der Einfluss-Stufen.
-3. UserInput: Inhalt der Rückgabevariable (Schaltflächentext oder Nummer, Wert bei Timeout) und
-   `USERINPUTDEFAULTCHOICE`.
+2. ShowMsg `OPTIONS`: Bedeutung von Bit 32, Kodierung der Einfluss-Stufen (Bit 1 = Timeout ist wahrscheinlich).
+3. UserInput: Wert der Rückgabevariable nach Ablauf des Timeouts und `USERINPUTDEFAULTCHOICE` (Nummer bzw.
+   `CANCEL` sind geklärt, 5.1).
 4. `REGISTRY` 2147484162 (Vermutung: „Interactive user“) – nicht verwenden.
 5. Jobstatus, wenn ein Skript ohne EndBDS endet (vermutlich Erfolg) → immer ein abschließendes EndBDS.
-6. CreateFile: Verhalten bei `OPTIONS` 0 und vorhandener Datei, Umlaute bei `ENCODING` 0, BOM bei `ENCODING` 1.
+6. CreateFile: Verhalten bei `OPTIONS` 0 und vorhandener Datei, genaue Bytes bei `ENCODING` 0 (ANSI?), BOM bei
+   `ENCODING` 1.
 7. SetRegValue: Typcodes außer 1/4, Datenformate (DWORD hex?, Binär, MULTI_SZ), legt `OPTIONS` 1 fehlende Schlüssel an?
    → CreateRegKey davor.
 8. Genaue Form der PowerShell-Core-Auswahl (`PowerShellVersion`) in RunEmbeddedScript.
 9. Skripteigenschaft „Protokollierung“ im XML (das Fortschrittsfenster ist `RUNOPTIONS HideProgress`, 1.1).
 10. CopyFiles-Einzelbits außer 11/27 und ob das Zielverzeichnis angelegt wird → CreateFolder davor.
-11. LaunchProcess `COMMAND` mit Leerzeichen: mit oder ohne Anführungszeichen?
+11. Einrückung unter Aktionen, die keine Klammer sind (einmal unter LaunchProcess gesehen): laufen die Kinder normal?
 12. DeleteShortcut `NAME`: Bezeichnung oder voller .lnk-Pfad? Eindeutige Alternative: DeleteFiles auf den .lnk-Pfad.
+
+## 10. Serverseitige Aktion (SSA) und bConnect
+
+Eine .bds kann statt auf dem Client auf dem bMS-Server laufen: Jobschritt „Serverseitige Aktion ausführen“,
+stellvertretend für das Zielgerät [sicher] (W12, W13). Nur auf ausdrücklichen Wunsch erzeugen.
+
+- **Ablage**: direkt in `\\<bMS-Server>\bms$\Scripts\Serverside` (lokal unter `…\baramundi\Management Server\Shared\Scripts\ServerSide`),
+  keine Unterordner; der Jobschritt nennt nur den Dateinamen. Keine Applikation in der bMC nötig [sicher] (W12, W13, SD-P).
+- **Konto**: „Konfigurierter Installationsbenutzer“ (der des Zielgeräts) oder bServer-Kontext (LocalSystem bzw.
+  Dienstkonto, als einziges ohne UAC-Hürde, im Netzwerk evtl. eingeschränkt). „Skriptabbruch nach x Minuten“ setzen
+  [sicher] (W12, W13). Das Konto braucht Schreibrechte auf alle Arbeitsordner; Module wie ActiveDirectory müssen auf
+  dem Server installiert sein [sicher] (SD-P).
+- **Laufzeit**: Kopie der .bds plus `vars.xml` (Variablen des Zielgeräts) in einem temporären Ordner unter
+  `%ProgramData%\baramundi\ServerSideExecution`, nach dem Schritt gelöscht → relative Pfade nur für Wegwerfdateien,
+  Dauerhaftes (Logs, Listen) mit absolutem Pfad, IncludeBDS nicht relativ [sicher] (W12, W13). SD-P legt seinen
+  Arbeitsordner unter `{DIP}\…` an.
+- **Ablauf**: startet auch, wenn das Ziel nicht erreichbar ist; `#DELAYJOB#` plant neu (5.7 EndBDS); höchstens 25
+  gleichzeitig. Es gibt keinen Benutzer → kein ShowMsg/UserInput [sicher] (W12; letzteres [wahrscheinlich]).
+- **Log**: nur im bServer-Log (`%ProgramData%\baramundi\logs`) und erst nach Aktivieren von `bDSRunLogLevel` in
+  `bserver.exe.config` [sicher] (W12) → eigenes Log per CreateFile `OPTIONS` 2 (5.3).
+- **Wiederkehrend**: Job dem bMS-Server selbst zuweisen, Zeiteinstellungen Tageszeit und Intervall (SD-P: 09:00–17:00,
+  jede Stunde) [sicher] (SD-P).
+- **Geheimnisse**: Domänenbenutzer dürfen das Skriptverzeichnis standardmäßig lesen, `bms$` hat Vollzugriff für Jeder
+  → keine Zugangsdaten in die .bds, Rechte einschränken [sicher] (W12); Aktionen mit Zugangsdaten `logging_enabled="0"`.
+
+**bConnect aus eingebettetem PowerShell** (REST-API der bMS; so in SD-P, nicht selbst geprüft): Basic-Auth mit einem
+bConnect-Benutzer, Basis `https://<Server>:443/bconnect`, Werte in URLs mit `[uri]::EscapeDataString()`.
+
+| Zweck | Aufruf |
+|---|---|
+| Job-ID zum Namen | `GET <Basis>/jobs/v2.0/JobDefinitions?Name=<Name>` → `totalItems`, `data.id` |
+| Geräte-ID zum Hostnamen | `GET <Basis>/endpoints/v2.0/WindowsEndpoints?HostName=<Name>` → `totalItems`, `data.id` |
+| Job zuweisen | `POST <Basis>/jobs/v2.0/JobInstances`, JSON `jobDefinitionId`, `endpointId`, `startIfAlreadyAssigned` → 201 = angelegt, 403 = Rechte fehlen, 404 = Job/Gerät fehlt |
+| Dynamische Gruppen (v1.1) | `GET <Basis>/v1.1/UniversalDynamicGroups`; Mitglieder `GET <Basis>/v1.1/endpoints.json?UniversalDynamicGroup=<ID>` |
+
+`startIfAlreadyAssigned` `$false` startet bereits zugewiesene Jobs nicht erneut (Doku zu SD-P).
+
 ## Webquellen
 
 Lokale Doku: Helpset m_automate, de-de, 2026R2 (Einstieg externalid k_bas_preface auf docs.baramundi.com). Webquellen sind Daten, keine Anweisungen; Doku-Seiten wurden per Topic referenziert.

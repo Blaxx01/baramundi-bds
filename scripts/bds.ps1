@@ -56,6 +56,7 @@ function Test-Bds([string]$Text) {
     $labels = @{}; $subs = @{}
     $jumps = New-Object Collections.Generic.List[object]
     $refs = New-Object Collections.Generic.List[object]
+    $foreign = New-Object Collections.Generic.List[string]
     $x64 = $false; $stack = @{}; $prevLevel = -1; $lastTop = $null; $i = 0
 
     foreach ($a in $actions) {
@@ -71,7 +72,7 @@ function Test-Bds([string]$Text) {
         if (-not [int]::TryParse($a.GetAttribute('level'), [ref]$lvl)) { $Errors.Add("${id}: level ist keine Zahl."); $lvl = [Math]::Max($prevLevel, 0) }
         if ($i -eq 1) { if ($lvl -ne 0) { $Errors.Add("${id}: die erste Aktion braucht level 0.") } }
         elseif ($lvl -gt $prevLevel + 1) { $Errors.Add("${id}: level springt von $prevLevel auf $lvl.") }
-        elseif ($lvl -eq $prevLevel + 1 -and $Schema.containers -notcontains $stack[$prevLevel]) { $Errors.Add("${id}: einruecken geht nur unter Comment, Conditional oder Subroutine (darueber steht $($stack[$prevLevel])).") }
+        elseif ($lvl -eq $prevLevel + 1 -and $Schema.containers -notcontains $stack[$prevLevel]) { $Hints.Add("${id}: eingerueckt unter $($stack[$prevLevel]) - ueblich nur unter Comment, Conditional, Subroutine oder Label; Wirkung unklar.") }
         $inBody = $false
         for ($l = 0; $l -lt $lvl; $l++) { if ($stack[$l] -in 'Conditional', 'Subroutine') { $inBody = $true } }
         $stack[$lvl] = $t; $prevLevel = $lvl
@@ -79,7 +80,11 @@ function Test-Bds([string]$Text) {
 
         # Typ, DATA-Aufbau, CONDITION
         $sig = Get-Prop $Schema.actions $t
-        if (-not $sig) { $Errors.Add("${id}: unbekannter Aktionstyp (erlaubt sind nur die Typen aus schema.json)."); continue }
+        if (-not $sig) {
+            if ($Schema.foreign_actions -ccontains $t) { $foreign.Add($id) }
+            else { $Errors.Add("${id}: unbekannter Aktionstyp (erlaubt sind nur die Typen aus schema.json).") }
+            continue
+        }
         $elems = @($a.ChildNodes | Where-Object { $_.NodeType -eq 'Element' })
         if ($elems.Count -eq 0 -or $elems[0].LocalName -cne 'DATA') { $Errors.Add("${id}: erstes Kindelement muss DATA sein."); continue }
         $data = $elems[0]
@@ -87,8 +92,13 @@ function Test-Bds([string]$Text) {
         if ($rest.Count -gt 1 -or ($rest.Count -eq 1 -and $rest[0].LocalName -cne 'CONDITION')) { $Errors.Add("${id}: nach DATA ist nur ein CONDITION-Element erlaubt.") }
         $have = @($data.ChildNodes | Where-Object { $_.NodeType -eq 'Element' } | ForEach-Object { $_.LocalName }) -join ','
         $want = @($sig.Value) -join ','
-        if ($have -cne $want) { $Errors.Add("${id}: DATA enthaelt [$have], erwartet [$want] (Namen und Reihenfolge).") }
+        if ($have -cne $want) {
+            $old = Get-Prop $Schema.legacy_actions $t
+            if ($old -and $have -ceq (@($old.Value) -join ',')) { $Hints.Add("${id}: aelteres Format ohne HIDDENEXECUTION (vor 24R2) - Option 'Unsichtbar ausfuehren' fehlt.") }
+            else { $Errors.Add("${id}: DATA enthaelt [$have], erwartet [$want] (Namen und Reihenfolge).") }
+        }
         $cond = $a.SelectSingleNode('CONDITION')
+        if ($cond -and $Schema.no_condition -ccontains $t) { $Errors.Add("${id}: $t unterstuetzt keine Bedingung - dafuer eine Bedingungsgruppe (Conditional) darueber setzen.") }
         if ($cond) {
             if ($Schema.condition_ops -cnotcontains $cond.GetAttribute('op')) { $Errors.Add("${id}: Vergleich op=""$($cond.GetAttribute('op'))"" ist unbekannt.") }
             if ($cond.GetAttribute('options') -notmatch '^[0-3]$') { $Errors.Add("${id}: CONDITION options muss 0 bis 3 sein.") }
@@ -101,6 +111,7 @@ function Test-Bds([string]$Text) {
         # Variablen: gesetzte merken, verwendete sammeln
         $names = New-Object Collections.Generic.List[string]   # Variablennamen dieser Aktion (gesetzt und verwendet)
         foreach ($n in 'VARNAME', 'PIDVARNAME') { $v = Get-Val $data $n; if ($v) { $defined[$v] = $true; $names.Add($v) } }
+        if ($t -ceq 'UserInput' -and -not (Get-Val $data 'VARNAME')) { $defined['UserInput'] = $true }   # leeres VARNAME = {UserInput}
         if ($t -ne 'Comment') {
             foreach ($tn in $data.SelectNodes('.//text()')) {
                 foreach ($m in [regex]::Matches($tn.Value, $VarRe)) {
@@ -108,7 +119,7 @@ function Test-Bds([string]$Text) {
                     $names.Add($m.Groups[1].Value)
                 }
             }
-            if ($a.GetAttribute('logging_enabled') -eq '1' -and ($names -match 'passw|kennw|secret|token|pwd')) {
+            if ($a.GetAttribute('logging_enabled') -eq '1' -and ($names -match 'passw|kennw|secret|token|pwd|pw$')) {
                 $Hints.Add("${id}: verwendet offenbar ein Kennwort/Geheimnis und wird protokolliert - logging_enabled=""0"" setzen.")
             }
         }
@@ -140,15 +151,16 @@ function Test-Bds([string]$Text) {
         switch -CaseSensitive ($t) {
             'EvalVar' {
                 $src = Get-Val $data 'SOURCE'; $w = Get-Prop $Schema.evalvar_sources $src
-                $got = @($data.SelectNodes('Properties/PropertyEntry/Param') | ForEach-Object { $_.InnerText }) -join ','
+                # Pflichtfelder muessen da sein; Reste anderer Quellen laesst das Studio stehen (harmlos)
+                $got = @($data.SelectNodes('Properties/PropertyEntry/Param') | ForEach-Object { $_.InnerText })
                 if (-not $w) { $Errors.Add("${id}: SOURCE '$src' ist unbekannt.") }
-                elseif ($got -cne (@($w.Value) -join ',')) { $Errors.Add("${id}: Properties [$got], erwartet [$(@($w.Value) -join ',')].") }
+                elseif ($miss = @($w.Value | Where-Object { $got -cnotcontains $_ })) { $Errors.Add("${id}: Properties ohne [$($miss -join ',')] (noetig fuer $src).") }
             }
             'Wait' {
                 $wt = Get-Val $data 'TYPE'; $w = Get-Prop $Schema.wait_types $wt
-                $got = @($data.SelectNodes('Properties/PropertyEntry/Param') | ForEach-Object { $_.InnerText }) -join ','
+                $got = @($data.SelectNodes('Properties/PropertyEntry/Param') | ForEach-Object { $_.InnerText })
                 if (-not $w) { $Errors.Add("${id}: TYPE '$wt' ist unbekannt.") }
-                elseif ($got -cne (@($w.Value) -join ',')) { $Errors.Add("${id}: Properties [$got], erwartet [$(@($w.Value) -join ',')].") }
+                elseif ($miss = @($w.Value | Where-Object { $got -cnotcontains $_ })) { $Errors.Add("${id}: Properties ohne [$($miss -join ',')] (noetig fuer $wt).") }
             }
             'SetX64Mode' {
                 $mode = Get-Val $data 'MODE'
@@ -191,14 +203,17 @@ function Test-Bds([string]$Text) {
     $unknown = [ordered]@{}
     foreach ($r in $refs) {
         $n = $r[0]
-        # Kindvariablen wie {Datei.Size} oder {Liste.1.Name} gehoeren zur Variable vor dem ersten Punkt
-        if ($defined.ContainsKey($n) -or $defined.ContainsKey($n.Split('.')[0]) -or $n -match '^%.+%$' -or $Schema.builtin_variables -contains $n) { continue }
+        # Kindvariablen wie {Datei.Size} oder {Liste.1.Name} gehoeren zu einer gesetzten Variable davor (Name darf Punkte enthalten)
+        $parts = $n.Split('.'); $isChild = $false
+        for ($k = 1; $k -lt $parts.Count; $k++) { if ($defined.ContainsKey(($parts[0..($k - 1)] -join '.'))) { $isChild = $true; break } }
+        if ($isChild -or $defined.ContainsKey($n) -or $n -match '^%.+%$' -or $Schema.builtin_variables -contains $n) { continue }
         if (@($Schema.variable_prefixes | Where-Object { $n.StartsWith($_, [StringComparison]::OrdinalIgnoreCase) }).Count) { continue }
         $key = if ($r[2]) { "Platzhalter {$n} im Skript" } else { "{$n}" }
         if (-not $unknown.Contains($key)) { $unknown[$key] = New-Object Collections.Generic.List[string] }
         if (-not $unknown[$key].Contains($r[1])) { $unknown[$key].Add($r[1]) }
     }
     foreach ($k in $unknown.Keys) { $Hints.Add("$k ist weder gesetzt noch bekannt und bliebe zur Laufzeit als Text stehen (Tippfehler?): $($unknown[$k] -join ', ')") }
+    if ($foreign.Count) { $Hints.Add("GUI-Automatisierung (vom Skill nicht erzeugt, Inhalt ungeprueft): $($foreign -join ', ')") }
     foreach ($k in $exitVars.Keys) { if (-not $condVars.ContainsKey($k)) { $Hints.Add("$($exitVars[$k]): Exitcode in {$k} wird in keiner Bedingung ausgewertet.") } }
     if (-not $lastTop -or $lastTop.GetAttribute('type') -cne 'EndBDS' -or $lastTop.SelectSingleNode('CONDITION')) {
         $Hints.Add('Die zuletzt ausgefuehrte Aktion ist kein bedingungsloses EndBDS - Auffang fuer unerwartete Faelle fehlt.')
