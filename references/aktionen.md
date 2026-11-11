@@ -150,11 +150,27 @@ Alle 148 ACTION-Elemente der Beispiele haben genau diese 7 Attribute in dieser R
   vermutlich auch im x64-Modus, der die Prozessumgebung nicht ändert [wahrscheinlich]. 64-Bit-Programmordner daher über
   `{%ProgramW6432%}` bzw. `{%CommonProgramW6432%}`, `{%ProgramFiles%}` nur für 32-Bit-Software [wahrscheinlich]
   (WOW64-Verhalten von Windows; die Auflösung durch bDS ist ungetestet).
-- **bMS-Systemvariablen** [sicher] (W5): `{DIP}` (Verteilpunkt), `{BMAPATH}`, `{BMSPATH}`, `{Client}`, `{Domain}`,
-  `{Username}`, `{OSType}` (z. B. Win11_x64), `{Architecture}`/`{Arch}`, `{Mode}` (Install/Deinstall), `{Job.Name}`,
-  `{GUIDJob}`, `{GUIDClient}`, `{LCID}`, `{UserLCID}`, `{Software.Name}`, `{Software.Version}`, `{Software.Vendor}`,
-  `{Reinstall}`, `{FirstInstall}`, `{RegisteredUser}`, `{Group}`. Nicht verwenden: `{CDROM}`; veraltet: `{KitsServer}`,
-  `{Depot}` (= `{DIP}`).
+- **bMS-Systemvariablen** – stehen in jedem Job bereit, ohne Setzen [sicher, Nutzer: Variablenliste eines echten Jobs,
+  bMS 26.1, 11.11.2026; dazu W5]. **Geräte-, Netzwerk- und Jobdaten zuerst hier holen, nicht per Registry, WMI oder
+  PowerShell** – z. B. Hersteller-Weichen direkt per Bedingung auf `{Manufacturer}`. Namen mit Doppelpunkt
+  (`{Client:IP}`) heißen wirklich so. Werte können leer sein (z. B. `{Client:EntraIdDeviceId}` ohne Entra ID,
+  `{InstallTargetPath}`) → bei Bedarf auf leer prüfen, nicht nur auf den Platzhaltertext.
+
+| Thema | Variablen (Beispielwert) |
+|---|---|
+| Gerät | `{Manufacturer}` (HP), `{ModelName}` (HP ProBook 450 G6), `{FirmwareType}` (UEFI), `{UEFISecureBoot}` (enabled), `{UEFIBootCurrent}`, `{Client}` = `{Machine}` = `{Machine.ComputerName}` (Gerätename), `{Client:DisplayName}`, `{Client:GUID}`, `{Client:UUID}` (BIOS-UUID), `{Client:EntraIdDeviceId}`, `{Client:TenantID}` |
+| Netzwerk | `{PrimaryIP}` = `{ClientAddress}` = `{Client:IP}`, `{PrimaryMAC}` = `{Client:MAC}`, `{Machine.LogicalMAC}`, `{PrimarySubnetMask}` = `{Client:SubnetMask}`, `{Client:CommunicationMode}`/`{Client:LastChannel}` (LAN), `{Network.Domain}` (DNS-Domäne), `{Network.Server}` |
+| Betriebssystem | `{OSType}` = `{Machine.OSType}` (Win11_x64), `{Architecture}` = `{Arch}` (x64), `{Machine.OSVersion}` (Klartext mit Build und Edition), `{Machine.OSDisplayVersion}` (z. B. 24H2), `{Machine.OSReleaseID}`, `{OSServicePack}`, `{LCID}` = `{LangID}`, `{UserLCID}` (1031 = Deutsch) |
+| Hardware | `{Machine.CPUDesc}`, `{Machine.CPUType}`, `{Machine.CPUSpeed}` (MHz), `{Machine.CPUCountPhysical}`/`{Machine.CPUCountTotalCores}`/`{Machine.CPUCountLogical}`, `{Machine.Memory}` (MB), `{Machine.DriveCSize}`/`{Machine.DriveCFree}` (MB; D und E analog, 0 = Laufwerk fehlt) |
+| Benutzer und Gruppe | `{Username}` = `{RegisteredUser}` (UPN), `{Machine.RegisteredUserName}` (Anzeigename), `{Machine.RegisteredUserDomain}`, `{Domain}` (NetBIOS-Name), `{Company}`, `{Group}` = `{Machine.GroupName}` (bMS-Gruppe), `{Machine.Profile}` |
+| Job und Software | `{Job.Name}`, `{Job.Creator}`, `{Job.Initiator}` (UPN des Auslösers), `{Software.Name}`, `{Software.Version}`, `{Software.Vendor}`, `{Mode}` (Install/Deinstall), `{Reinstall}` (FirstInstall bei Erstinstallation), `{Script}` (Pfad der laufenden .bds), `{InstallTargetPath}`; nur in W5: `{GUIDJob}`, `{GUIDClient}` |
+| baramundi | `{DIP}` = `{Network.DIP}` (Verteilpunkt), `{Server}` = `{Network.Server}` (bMS als FQDN), `{ServerHostname}`, `{BMAPath}`, `{BMAVersion}`, `{BMSPath}`, `{BMSVersion}`, `{BDScript.ActionDelay}`/`{BDScript.GUIActionDelay}` (ms) |
+
+  Hinweise: Hersteller und Modell stammen vermutlich aus der Inventur der bMS (bei einem frisch aufgenommenen Gerät
+  womöglich leer) [wahrscheinlich]. Ältere HP-Geräte melden sich teils als „Hewlett-Packard“ → Weiche mit `CONTAINS`
+  statt `=` und beide Schreibweisen bedenken [wahrscheinlich]. `{NetworkDiscovery.EnrollmentToken}` ist ein Geheimnis
+  → nur mit `logging_enabled="0"` verwenden. `{FirstInstall}` fehlt in der Liste: Es ist der Wert von `{Reinstall}`,
+  keine eigene Variable [wahrscheinlich]. Nicht verwenden: `{CDROM}`; veraltet: `{KitsServer}`, `{Depot}` (= `{DIP}`).
 - **Benutzerdefinierte bMS-Variablen** `{Bereich.Kategorie.Name}` mit Bereich Client, Group, Profile, Software, Job;
   Typen Zeichenkette (ohne `'` und `"`), Ein/Aus (T/F), Passwort (verschlüsselt), Zahl, Datum [sicher] (W6, W7, SD-I).
   - **Client-Variable vom Gerät aus setzen**: LaunchProcess mit BMACmd (Vorlage 5.6),

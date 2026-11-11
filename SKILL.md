@@ -42,7 +42,9 @@ zusätzlich die Syntax eingebetteter PowerShell-Skripte.
 ## Neues Skript
 
 1. **Klären.** Nur nachfragen, wenn eine Lücke das Ergebnis ändert (höchstens drei Fragen auf einmal), z. B.
-   genauer Registry-Pfad, Verhalten im Fehlerfall, Neustart nötig. Kleinigkeiten mit sinnvollen Standardwerten
+   genauer Registry-Pfad, Verhalten im Fehlerfall, Neustart nötig. Nicht fragen und nicht selbst ermitteln, was die
+   bMS als Variable liefert – Hersteller, Modell, IP, Betriebssystem, Secure Boot, Benutzer, Job (`aktionen.md` 3.2,
+   Tabelle der bMS-Systemvariablen). Kleinigkeiten mit sinnvollen Standardwerten
    lösen und in der Abgabe als Annahme nennen.
 2. **Planen.** Ablauf als Liste von Aktionen. Native Aktionen zuerst (Dateien, Registry, Dienste, Prozesse …):
    Sie sind im Studio lesbar und stehen einzeln im Joblog. Eingebettetes PowerShell nur für Logik, die nativ
