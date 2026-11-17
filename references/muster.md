@@ -17,7 +17,7 @@ einzelnen Aktionen stehen in `aktionen.md`.
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <baramundiDeployScript Version="2620" LastChange="01.01.2026 00:00:00">
 <META>
-<INFO Vendor="" Name="" Version="" Author="" Comment="Ein Satz zum Zweck des Skripts."/>
+<INFO Vendor="" Name="" Version="" Author="[[Author]]" Comment="Ein Satz zum Zweck des Skripts."/>
 <STATICVARS LoadInstallIni="1">
 <BMSVars></BMSVars>
 </STATICVARS>
@@ -165,7 +165,7 @@ Ausgänge: 0 Erfolg, 2/3/5 Fehler, 4 Erfolg (umgestellt), alles andere → Auffa
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <baramundiDeployScript Version="2620" LastChange="04.11.2026 12:00:00">
 <META>
-<INFO Vendor="" Name="" Version="" Author="" Comment="Prüft, unter welchem Konto eine geplante Aufgabe läuft, und stellt sie auf Wunsch um."/>
+<INFO Vendor="" Name="" Version="" Author="[[Author]]" Comment="Prüft, unter welchem Konto eine geplante Aufgabe läuft, und stellt sie auf Wunsch um."/>
 <STATICVARS LoadInstallIni="1">
 <BMSVars></BMSVars>
 </STATICVARS>

@@ -48,6 +48,8 @@ function Test-Bds([string]$Text) {
     if ($root.GetAttribute('Version') -ne $Schema.version) { $Hints.Add("Version=""$($root.GetAttribute('Version'))"", erwartet $($Schema.version).") }
     if ($root.GetAttribute('LastChange') -notmatch '^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}:\d{2}$') { $Errors.Add('LastChange fehlt oder ist nicht TT.MM.JJJJ hh:mm:ss.') }
     if (-not $root.SelectSingleNode('META/INFO') -or -not $root.SelectSingleNode('META/STATICVARS/BMSVars')) { $Errors.Add('META/INFO oder META/STATICVARS/BMSVars fehlt.') }
+    $info = $root.SelectSingleNode('META/INFO')
+    if ($info -and $info.GetAttribute('Author').Contains('[[')) { $Errors.Add('Author enthaelt noch den Platzhalter [[Author]] - Wert aus author.txt einsetzen oder leer lassen.') }
     if (-not $root.SelectSingleNode('ACTIONS')) { $Errors.Add('ACTIONS fehlt.'); return }
     $actions = @($root.SelectNodes('ACTIONS/ACTION'))
     if ($actions.Count -eq 0) { $Errors.Add('Keine Aktionen.'); return }

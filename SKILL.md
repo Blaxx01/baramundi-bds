@@ -86,8 +86,10 @@ Fehler; solche Skripte pflegt der Hersteller, sie werden nicht geändert.
 
 Mit dem Nutzer vereinbart; jede Regel hat einen Grund.
 
-- **Kopf:** `Version="2620"` (bDS-Schema des Automation Studio 26R2), `Author=""`,
-  `Comment` = ein Satz zum Zweck. LastChange setzt `save`. Ältere Skripte (z. B. `2420`) öffnet das Studio 26R2 nur
+- **Kopf:** `Version="2620"` (bDS-Schema des Automation Studio 26R2), `Comment` = ein Satz zum Zweck, `Author` =
+  die erste Zeile der Datei `author.txt` im Skillordner (in den Vorlagen als `[[Author]]`). Fehlt die Datei,
+  `Author=""` setzen und in der Abgabe darauf hinweisen. Bei bestehenden Skripten den Author nicht ändern.
+  LastChange setzt `save`. Ältere Skripte (z. B. `2420`) öffnet das Studio 26R2 nur
   schreibgeschützt oder konvertiert sie; die Konvertierung ändert nur `Version`. Wird ein eigenes Skript mit älterer
   Version geändert, deshalb in der Arbeitskopie `Version="2620"` setzen und das in der Abgabe nennen (läuft danach
   nur noch auf aktuellem bMA). Herstellerskripte bleiben unangetastet.

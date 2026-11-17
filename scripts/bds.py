@@ -50,6 +50,8 @@ def check(text):
         errors.append("LastChange fehlt oder ist nicht TT.MM.JJJJ hh:mm:ss.")
     if root.find("META/INFO") is None or root.find("META/STATICVARS/BMSVars") is None:
         errors.append("META/INFO oder META/STATICVARS/BMSVars fehlt.")
+    elif "[[" in (root.find("META/INFO").get("Author") or ""):
+        errors.append("Author enthaelt noch den Platzhalter [[Author]] - Wert aus author.txt einsetzen oder leer lassen.")
     if root.find("ACTIONS") is None:
         errors.append("ACTIONS fehlt.")
         return

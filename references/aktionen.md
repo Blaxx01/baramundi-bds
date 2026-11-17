@@ -59,7 +59,7 @@ Webquellen
   Meldung in BDScript.dll) – stattdessen EvalVar `Expression` (Abschnitt 7).
 - `LastChange` = Ortszeit `dd.MM.yyyy HH:mm:ss` – setzt `bds save`.
 - `INFO` = Reiter „Allgemein“ der Skripteigenschaften: Vendor (Hersteller), Name, Version (Skriptversion), Author,
-  Comment (Kommentar); selbstschließend, Reihenfolge fest [wahrscheinlich] (t23366). Hausregel: Author fest, Comment = Zweck.
+  Comment (Kommentar); selbstschließend, Reihenfolge fest [wahrscheinlich] (t23366). Hausregel: Author aus `author.txt` (SKILL.md), Comment = Zweck.
 - `STATICVARS LoadInstallIni="1"` mit leerem `<BMSVars></BMSVars>` unverändert übernehmen [sicher].
 - Weitere Elemente aus baramundis eigenem Installationsskript (Managed Software, Schema 2220):
   `<MANAGEDSOFTWAREWRITELOCK>True</MANAGEDSOFTWAREWRITELOCK>` in `META` zwischen `INFO` und `STATICVARS`
