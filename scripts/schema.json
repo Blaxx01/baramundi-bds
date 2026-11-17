@@ -1,5 +1,5 @@
 {
-  "version": "2420",
+  "version": "2620",
   "containers": ["Comment", "Conditional", "Subroutine", "Label"],
   "no_condition": ["Comment", "Label", "Subroutine"],
   "legacy_actions": {

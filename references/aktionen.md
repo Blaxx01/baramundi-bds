@@ -1,4 +1,4 @@
-# Aktionskatalog und Format (.bds, Schema 2420)
+# Aktionskatalog und Format (.bds, Schema 2620)
 
 Nachschlagewerk zum Schreiben von .bds-Dateien. Grundlage: zwei Beispieldateien des Nutzers (US = UniversalScript.bds,
 Schaudatei fast aller Aktionen; CTU = Check_TaskUser.bds, Produktivskript), die Gewinnerskripte der baramundi
@@ -32,7 +32,7 @@ Webquellen
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<baramundiDeployScript Version="2420" LastChange="[[dd.MM.yyyy HH:mm:ss]]">
+<baramundiDeployScript Version="2620" LastChange="[[dd.MM.yyyy HH:mm:ss]]">
 <META>
 <INFO Vendor="" Name="" Version="" Author="" Comment=""/>
 <STATICVARS LoadInstallIni="1">
@@ -46,8 +46,17 @@ Webquellen
 ```
 
 - Deklaration exakt so, ohne BOM; Wurzel mit genau `Version` und `LastChange` in dieser Reihenfolge [sicher].
-- `Version="2420"` = bDS-Schema seit 24R2 (eingeführt mit „Unsichtbar ausführen“); solche Skripte laufen nicht auf
-  Agenten vor 24R2 [sicher] (t23436, W1).
+- `Version="2620"` = bDS-Schema des Automation Studio 26R2 (26.2.147) [sicher] (vom Studio gespeicherte Dateien,
+  17.11.2026). Vorgänger `2420` = Schema seit 24R2 (eingeführt mit „Unsichtbar ausführen“), läuft nicht auf Agenten
+  vor 24R2 [sicher] (t23436, W1).
+- Ältere Skripte öffnet das Studio 26R2 nur schreibgeschützt oder konvertiert sie auf Nachfrage; konvertierte
+  Skripte laufen laut Dialog nur noch auf dem aktuellsten bMA. Die Konvertierung 2420 → 2620 ändert nur `Version`
+  (und `LastChange`) [sicher] – byteweiser Vergleich eines Skripts mit Comment, SetVar, SetX64Mode,
+  RunEmbeddedScript, EvalVar/IniFile und EndBDS. Eine zweite vom Studio 26R2 gespeicherte Datei (EvalVar SubString/
+  Expression/FileInfo, Conditional, Subroutine, CallSubroutine, Label, GotoLabel, MoveFileOrFolder, CopyFiles,
+  CreateFolder) entspricht ebenfalls den Vorlagen hier. Übrige Aktionen in 2620: ungeprüft [wahrscheinlich gleich].
+- Inline-Ausdrücke `{=…}` (VBScript) im Text unterstützt 26R2 nicht mehr („Verwendung einer veralteten Syntax“,
+  Meldung in BDScript.dll) – stattdessen EvalVar `Expression` (Abschnitt 7).
 - `LastChange` = Ortszeit `dd.MM.yyyy HH:mm:ss` – setzt `bds save`.
 - `INFO` = Reiter „Allgemein“ der Skripteigenschaften: Vendor (Hersteller), Name, Version (Skriptversion), Author,
   Comment (Kommentar); selbstschließend, Reihenfolge fest [wahrscheinlich] (t23366). Hausregel: Author fest, Comment = Zweck.
@@ -1114,7 +1123,7 @@ Grundlage: baramundi-eigener VBScript-Ausdrucksinterpreter, ersetzt die von Micr
 - `ARGEUMENT` mit Tippfehler; `RETURNCODE` (TerminateProcess) Singular; `RETURNMODESTR` enthält eine Zahl [sicher].
 - CopyFiles ohne Überschreiben überspringt still; DownloadFile ohne Überschreiben bricht ab [sicher] (t23428, t23447).
 - Berechneter Ausdruck bricht bei Fehlern nicht ab, sondern liefert eine Fehlermarke [sicher] (t23323).
-- Schema 2420 läuft nicht auf bMA vor 24R2 [sicher] (W1).
+- Schema 2620 läuft laut Studio-Dialog nur auf dem aktuellsten bMA (26R2) [wahrscheinlich]; Schema 2420 nicht vor 24R2 [sicher] (W1).
 - Kein Else; Comment, Label und Subroutine ohne Bedingung; höchstens eine CONDITION je Aktion [sicher].
 - KeyboardMouseLock wird im Studio-Debug übergangen – Tests im Studio sagen über diese Aktion nichts [sicher] (t23417).
 - Installer per LaunchProcess: `OPTIONS` 1, `RETURNCODES` `0,3010,1641` + `VARNAME`, danach Bedingung auf 3010/1641

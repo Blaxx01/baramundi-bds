@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<baramundiDeployScript Version="2420" LastChange="04.11.2026 13:22:06">
+<baramundiDeployScript Version="2620" LastChange="04.11.2026 13:22:06">
 <META>
 <INFO Vendor="" Name="" Version="" Author="" Comment=""/>
 <STATICVARS LoadInstallIni="1">

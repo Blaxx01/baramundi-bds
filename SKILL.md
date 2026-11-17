@@ -86,8 +86,11 @@ Fehler; solche Skripte pflegt der Hersteller, sie werden nicht geändert.
 
 Mit dem Nutzer vereinbart; jede Regel hat einen Grund.
 
-- **Kopf:** `Version="2420"` (bDS-Schema seit 24R2), `Author=""`, `Comment` = ein Satz
-  zum Zweck. LastChange setzt `save`.
+- **Kopf:** `Version="2620"` (bDS-Schema des Automation Studio 26R2), `Author=""`,
+  `Comment` = ein Satz zum Zweck. LastChange setzt `save`. Ältere Skripte (z. B. `2420`) öffnet das Studio 26R2 nur
+  schreibgeschützt oder konvertiert sie; die Konvertierung ändert nur `Version`. Wird ein eigenes Skript mit älterer
+  Version geändert, deshalb in der Arbeitskopie `Version="2620"` setzen und das in der Abgabe nennen (läuft danach
+  nur noch auf aktuellem bMA). Herstellerskripte bleiben unangetastet.
 - **Gliederung:** Kommentar-Aktionen als Abschnittsüberschriften (Parameter, Prüfen, Ausführen, Abschluss), damit
   das Skript im Studio lesbar bleibt. Einrückung (`level`) nach `references/aktionen.md`.
 - **Parameter:** Veränderliche Werte kommen als Job-Parameter: `{JobParam.X}` → „Variable setzen“ → Verwendung als

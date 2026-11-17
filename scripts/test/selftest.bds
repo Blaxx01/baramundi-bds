@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<baramundiDeployScript Version="2420" LastChange="05.11.2026 12:00:00">
+<baramundiDeployScript Version="2620" LastChange="05.11.2026 12:00:00">
 <META>
 <INFO Vendor="" Name="Selbsttest" Version="" Author="" Comment="Prueft die Regeln von bds.ps1/bds.py"/>
 <STATICVARS LoadInstallIni="1">
